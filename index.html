@@ -66,10 +66,6 @@
     color:#000;
     font-weight:500;
   }
-  input[type="password"]::placeholder{
-    color:#333;
-    opacity:1;
-  }
 
   button{
     background:var(--accent);
@@ -78,10 +74,8 @@
     padding:10px 14px;
     border-radius:10px;
     cursor:pointer;
-    font-size:0.95rem;
   }
   button.secondary{background:#eee;color:#333}
-  button:active{transform:translateY(1px)}
 
   canvas{position:fixed;top:0;left:0;pointer-events:none;z-index:6}
   .heart{position:fixed;top:-10px;font-size:22px;opacity:0.9;pointer-events:none;z-index:7}
@@ -89,119 +83,149 @@
   @keyframes pop{from{transform:scale(.85);opacity:0}to{transform:none;opacity:1}}
 
   .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:24px;background:#222;color:#fff;padding:10px 14px;border-radius:10px;opacity:0;pointer-events:none;transition:all .25s;z-index:60}
-  .toast.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+  .toast.show{opacity:1;pointer-events:auto}
 
   .final{font-size:1.05rem;color:var(--accent)}
 
-  @media (max-width:360px){
-    h1{font-size:1.3rem}
-    input[type="password"]{min-width:120px}
-  }
-
-  #confetti { pointer-events: none !important; }
-
   #slideshowOverlay {
-    position: fixed;
-    inset: 0;
-    display: none;
-    z-index: 20;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0,0,0,0.28);
-    padding: 30px;
+    position: fixed; inset:0; display:none; z-index:20;
+    align-items:center; justify-content:center;
+    background: rgba(0,0,0,0.28); padding:30px;
   }
   #slideCard {
-    max-width: 900px;
-    width: 90%;
-    max-height: 90%;
-    background: rgba(255,255,255,0.92);
-    border-radius: 12px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.45);
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    padding: 18px;
-    position: relative;
-    overflow: hidden;
+    max-width:900px; width:90%; max-height:90%;
+    background:rgba(255,255,255,0.92);
+    border-radius:12px; box-shadow:0 12px 40px rgba(0,0,0,0.45);
+    display:flex; flex-direction:column; align-items:center;
+    justify-content:center; padding:18px; position:relative;
   }
-  .slideImg {
-    max-width: 100%;
-    max-height: 64vh;
-    object-fit: cover;
-    border-radius: 8px;
-    opacity: 0;
-    transition: opacity .9s ease;
-    display:block;
-  }
-  .slideImg.show { opacity: 1; }
-  .slideCaption {
-    margin-top: 12px;
-    font-size: 1.15rem;
-    color: #333;
-    text-align:center;
-    padding: 6px 12px;
-  }
-  #slideControls { margin-top: 10px; display:flex; gap:8px; align-items:center; justify-content:center; }
-  #slideIndex { color:#777; font-size:0.95rem; }
-  #skipBtn { background: transparent; border: 1px solid #ddd; padding:6px 10px; border-radius:8px; color:#333; cursor:pointer; }
+  .slideImg { max-width:100%; max-height:64vh; object-fit:cover; border-radius:8px;
+    opacity:0; transition:opacity .9s ease; }
+  .slideImg.show { opacity:1; }
 </style>
-
 </head>
 <body>
 
-<canvas id="confetti"></canvas>
+<audio id="bgMusic" preload="auto">
+  <source src="https://github.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/raw/refs/heads/main/Arushi.mp3" type="audio/mpeg">
+</audio>
 
-<!-- Background Music -->
-<audio id="music" src="https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/refs/heads/main/Arushi.mp3" loop></audio>
+<canvas id="confetti"></canvas>
 
 <div class="card" id="card">
   <h1>🎉 Happy Birthday ARUSHI! 🎂</h1>
   <p id="message">Enter the secret password to unlock your surprise 😘</p>
 
   <div class="controls" id="controls">
-    <input id="pass" type="password" placeholder="Enter password" aria-label="password">
-    <button id="unlockBtn" type="button">Unlock 🎁</button>
+    <input id="pass" type="password" placeholder="Enter password">
+    <button id="unlockBtn">Unlock 🎁</button>
   </div>
 
   <div style="margin-top:12px;">
-    <button id="surprise" class="secondary" style="display:none" type="button">Click for a Surprise 🎁</button>
+    <button id="surprise" class="secondary" style="display:none">Click for a Surprise 🎁</button>
   </div>
 
   <div id="finalActions" style="display:none;margin-top:14px;">
-    <div class="final" id="finalMessage">Thanks for celebrating! 🎂</div>
-    <div style="margin-top:10px;"><button id="doneBtn" class="secondary" type="button">Close</button></div>
+    <div class="final" id="finalMessage"></div>
+    <button id="doneBtn" class="secondary" style="margin-top:10px;">Close</button>
   </div>
 </div>
 
-<div id="slideshowOverlay" aria-hidden="true">
-  <div id="slideCard" role="dialog" aria-modal="true" aria-label="Slideshow">
-    <img id="slideImage" class="slideImg" src="" alt="Slideshow photo">
-    <div id="slideCaption" class="slideCaption"></div>
-    <div id="slideControls">
-      <div id="slideIndex"></div>
-      <button id="skipBtn">Skip Slideshow</button>
-    </div>
+<div id="slideshowOverlay">
+  <div id="slideCard">
+    <img id="slideImage" class="slideImg" src="">
+    <div id="slideCaption"></div>
   </div>
 </div>
 
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div id="toast" class="toast"></div>
 
 <script>
-/* Everything inside is unchanged EXCEPT the surprise button event */
+// MUSIC
+const music = document.getElementById("bgMusic");
+function playMusic() {
+  music.volume = 0.6;
+  music.play().catch(()=>{});
+}
 
-…
+// Messages updated!
+const messages = [
+  "You are the most special person in my life 💖",
+  "Your smile makes everything brighter ✨",
+  "Thank you for being YOU 🌻",
+  "Once again love you very much 😘",
+  "Mwuaahhh😚",
+  "I’m so lucky to have you 🎀",
+  "Happy Birthday once again my favourite person 🎂💘",
+  "menna waddek innava😌",
+  "piggy kenek wage👀",
+  "cuteeeeeeee😘💘",
+];
 
-/* Surprise button now starts music + confetti + slideshow */
-surpriseBtn.addEventListener('click',()=>{
-  document.getElementById('music').play().catch(()=>{});
-  surpriseBtn.style.display = 'none';
-  startConfetti();
-  showToast('Enjoy the surprise! 🎊',1200);
-  setTimeout(()=> startSlideshow(), 450);
-});
+// Images stay the same
+const slides = [
+  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide1.jpg",
+  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide2.jpg",
+  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide3.jpg",
+  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide4.jpg",
+  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide5.jpg",
+  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide6.jpg",
+  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide7.jpg",
+  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide8.jpg",
+  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide9.jpg",
+  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide10.jpg"
+];
 
-…
+// Password unlock
+const unlockBtn = document.getElementById("unlockBtn");
+const surpriseBtn = document.getElementById("surprise");
+const passInput = document.getElementById("pass");
+const toast = document.getElementById("toast");
+const card = document.getElementById("card");
+function showToast(t){ toast.textContent=t; toast.classList.add("show");
+ setTimeout(()=>toast.classList.remove("show"),1600);}
+
+unlockBtn.onclick = () => {
+  if(passInput.value === "arushi08"){
+    document.getElementById("controls").style.display="none";
+    surpriseBtn.style.display="inline-block";
+    showToast("Correct password 😘");
+  } else {
+    showToast("Wrong password naughty 🤭");
+    card.animate([{transform:"translateX(-5px)"},{transform:"translateX(5px)"},{transform:"translateX(0)"}],{duration:300});
+  }
+};
+
+// Slideshow + music + confetti
+const slideshow = document.getElementById("slideshowOverlay");
+const slideImg = document.getElementById("slideImage");
+const slideCaption = document.getElementById("slideCaption");
+let i=0;
+
+function nextSlide(){
+  if(i >= messages.length){
+    slideshow.style.display="none";
+    document.getElementById("finalActions").style.display="block";
+    document.getElementById("finalMessage").textContent="Happy Birthday again LOVE YOU UMMAH 🎈";
+    return;
+  }
+  slideImg.classList.remove("show");
+  slideImg.src = slides[i];
+  slideCaption.textContent = messages[i];
+  slideImg.onload = ()=>requestAnimationFrame(()=>slideImg.classList.add("show"));
+  i++;
+  setTimeout(nextSlide,2500);
+}
+
+surpriseBtn.onclick = () => {
+  surpriseBtn.style.display="none";
+  playMusic();   // <<— MUSIC STARTS HERE 🎶💘
+  slideshow.style.display="flex";
+  nextSlide();
+};
+
+document.getElementById("doneBtn").onclick = ()=>location.reload();
 </script>
+
 </body>
 </html>
