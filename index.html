@@ -111,10 +111,6 @@ button.secondary{
 </head>
 <body>
 
-<audio id="bgMusic" preload="auto">
-  <source src="Arushi.mp3" type="audio/mpeg">
-</audio>
-
 <div class="card" id="card">
   <h1>🎉 Happy Birthday ARUSHI! 🎂</h1>
   <p id="message">Enter the secret password to unlock your surprise 😘</p>
@@ -141,23 +137,21 @@ button.secondary{
 
 <script>
 // Elements
-const music = document.getElementById("bgMusic");
-const unlockBtn = document.getElementById("unlockBtn");
-const surpriseBtn = document.getElementById("surpriseBtn");
-const passInput = document.getElementById("pass");
-const toast = document.getElementById("toast");
-const slideshow = document.getElementById("slideshowOverlay");
-const slideImg = document.getElementById("slideImage");
-const slideCaption = document.getElementById("slideCaption");
+const unlockBtn=document.getElementById("unlockBtn");
+const surpriseBtn=document.getElementById("surpriseBtn");
+const passInput=document.getElementById("pass");
+const toast=document.getElementById("toast");
+const slideshow=document.getElementById("slideshowOverlay");
+const slideImg=document.getElementById("slideImage");
+const slideCaption=document.getElementById("slideCaption");
 
-// Toast
 function showToast(t){
   toast.textContent=t;
   toast.classList.add("show");
   setTimeout(()=>toast.classList.remove("show"),1800);
 }
 
-// Message list
+// MESSAGES
 const messages=[
   "You are the most special person in my life 💖",
   "Your smile makes everything brighter ✨",
@@ -171,55 +165,48 @@ const messages=[
   "cuteeeeeeee😘💘",
 ];
 
-// Slides
+// SLIDES
 const slides=[
   "slide1.jpg","slide2.jpg","slide3.jpg","slide4.jpg","slide5.jpg",
   "slide6.jpg","slide7.jpg","slide8.jpg","slide9.jpg","slide10.jpg"
 ];
 
-// Unlock button
-unlockBtn.onclick = ()=>{
-  if(passInput.value === "arushi08"){
+// PASSWORD
+unlockBtn.onclick=()=>{
+  if(passInput.value==="arushi08"){
     showToast("Correct password 😘");
-    surpriseBtn.style.display="inline-block";
     unlockBtn.style.display="none";
     passInput.style.display="none";
-  } else {
+    surpriseBtn.style.display="inline-block";
+  }else{
     showToast("Wrong password naughty 🤭");
   }
 };
 
-// Slideshow + music
-let index=0;
-function playMusic(){
-  music.volume = 1.0;  // 💥 LOUD
-  music.play().catch(()=>{});
-}
-
+// SLIDESHOW
+let i=0;
 function nextSlide(){
-  if(index >= messages.length){
+  if(i>=messages.length){
     slideshow.style.display="none";
     document.getElementById("finalActions").style.display="block";
     document.getElementById("finalMsg").textContent="Happy Birthday again LOVE YOU UMMAH 🎈";
     return;
   }
   slideImg.classList.remove("show");
-  slideImg.src = slides[index];
-  slideCaption.textContent = messages[index];
-  slideImg.onload = ()=> requestAnimationFrame(()=> slideImg.classList.add("show"));
-  index++;
+  slideImg.src = slides[i];
+  slideCaption.textContent = messages[i];
+  slideImg.onload =()=> requestAnimationFrame(()=> slideImg.classList.add("show"));
+  i++;
   setTimeout(nextSlide,2500);
 }
 
-surpriseBtn.onclick = ()=>{
-  playMusic(); // 🔊 starts here
+surpriseBtn.onclick=()=>{
   surpriseBtn.style.display="none";
   slideshow.style.display="flex";
   nextSlide();
 };
 
-document.getElementById("doneBtn").onclick = ()=> location.reload();
+document.getElementById("doneBtn").onclick=()=>location.reload();
 </script>
-
 </body>
 </html>
