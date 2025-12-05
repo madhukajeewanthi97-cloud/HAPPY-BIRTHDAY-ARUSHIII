@@ -138,23 +138,30 @@ button.secondary{
 <div id="toast" class="toast"></div>
 
 <script>
-// DOM Elements
+// Elements
 const passInput = document.getElementById("pass");
 const unlockBtn = document.getElementById("unlockBtn");
-const surpriseBtn = document.getElementById("surpriseBtn");
 const toast = document.getElementById("toast");
+const surpriseBtn = document.getElementById("surpriseBtn");
 const slideshow = document.getElementById("slideshowOverlay");
 const slideImg = document.getElementById("slideImage");
 const slideCaption = document.getElementById("slideCaption");
 
-// Toast
-function showToast(t){
-  toast.textContent = t;
-  toast.classList.add("show");
-  setTimeout(()=> toast.classList.remove("show"),1800);
-}
+// IMAGES
+const slides = [
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide1.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide2.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide3.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide4.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide5.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide6.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide7.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide8.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide9.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide10.jpg"
+];
 
-// Messages
+// MESSAGES
 const messages = [
   "You are the most special person in my life 💖",
   "Your smile makes everything brighter ✨",
@@ -165,59 +172,57 @@ const messages = [
   "Happy Birthday once again my favourite person 🎂💘",
   "menna waddek innava😌",
   "piggy kenek wage👀",
-  "cuteeeeeeee😘💘",
+  "cuteeeeeeee😘💘"
 ];
 
-// Slides (local repo images)
-const slides = [
-  "slide1.jpg","slide2.jpg","slide3.jpg","slide4.jpg","slide5.jpg",
-  "slide6.jpg","slide7.jpg","slide8.jpg","slide9.jpg","slide10.jpg"
-];
+// Toast
+function showToast(t){
+  toast.textContent = t;
+  toast.classList.add("show");
+  setTimeout(()=>toast.classList.remove("show"),1800);
+}
 
-// Password unlock
+// PASSWORD UNLOCK
 unlockBtn.onclick = () => {
   if(passInput.value === "arushi08"){
     showToast("Correct password 😘");
-    unlockBtn.style.display = "none";
-    passInput.style.display = "none";
-    surpriseBtn.style.display = "inline-block";
+    unlockBtn.style.display="none";
+    passInput.style.display="none";
+    surpriseBtn.style.display="inline-block";
   } else {
     showToast("Wrong password naughty 🤭");
   }
 };
 
-// Slideshow
+// SLIDESHOW
 let i = 0;
 function nextSlide(){
-  if(i >= messages.length){
-    slideshow.style.display = "none";
-    document.getElementById("finalActions").style.display = "block";
-    document.getElementById("finalMsg").textContent = "Happy Birthday again LOVE YOU UMMAH 🎈";
+  if(i >= slides.length){
+    slideshow.style.display="none";
+    document.getElementById("finalActions").style.display="block";
+    document.getElementById("finalMsg").textContent="Happy Birthday again LOVE YOU UMMAH 🎈";
     return;
   }
-  
   slideImg.classList.remove("show");
   slideImg.src = slides[i];
   slideCaption.textContent = messages[i];
-
-  slideImg.onload = () =>
-    requestAnimationFrame(() => slideImg.classList.add("show"));
-
+  slideImg.onload = () => requestAnimationFrame(()=> slideImg.classList.add("show"));
   i++;
-  setTimeout(nextSlide, 2500);
+  setTimeout(nextSlide,2500);
 }
 
+// Start slideshow
 surpriseBtn.onclick = () => {
-  surpriseBtn.style.display = "none";
-  slideshow.style.display = "flex";
+  surpriseBtn.style.display="none";
+  slideshow.style.display="flex";
   nextSlide();
 };
 
 document.getElementById("doneBtn").onclick = () => location.reload();
 </script>
-
 </body>
 </html>
+
 
 
 
