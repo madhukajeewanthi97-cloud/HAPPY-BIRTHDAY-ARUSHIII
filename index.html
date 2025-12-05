@@ -10,11 +10,15 @@
   --accent:#ff4e50;
 }
 html,body{
-  height:100%; margin:0; padding:0;
-  font-family:'Poppins',sans-serif;
-  background:linear-gradient(135deg,#ff9a9e,#fad0c4);
-  overflow:hidden;
+  margin:0; padding:0;
+  height:100%;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,'Poppins',sans-serif;
+  background-image:url("bg.png");
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
 }
+
 .center{
   display:flex; flex-direction:column;
   align-items:center; justify-content:center;
@@ -213,3 +217,4 @@ document.getElementById("doneBtn").onclick=()=>location.reload();
 </script>
 </body>
 </html>
+
