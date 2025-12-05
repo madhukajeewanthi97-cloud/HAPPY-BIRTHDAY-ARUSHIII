@@ -16,12 +16,15 @@
   }
 
   body{
-    background-image: url("https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/bg.png");
+    /* GitHub hosted background */
+   background-image: url("https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/bg.png");
+
     background-position: center center;
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
 
+    /* Dark overlay so card stays readable */
     position: relative;
     display:flex;
     align-items:center;
@@ -30,6 +33,7 @@
     box-sizing:border-box;
   }
 
+  /* Overlay layer */
   body::before {
     content: "";
     position: fixed;
@@ -54,7 +58,6 @@
   h1{color:var(--accent);font-size:1.6rem;margin:6px 0}
   p{color:#555;margin:8px 0 14px;font-size:1rem}
   .controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
-
   input[type="password"]{
     padding:10px;border-radius:10px;border:1px solid #ddd;flex:1;min-width:150px;
   }
@@ -80,13 +83,18 @@
     input[type="password"]{min-width:120px}
   }
 
-  #confetti { pointer-events: none !important; }
-  #surprise { position: relative; z-index: 10; }
+  #confetti {
+    pointer-events: none !important;
+  }
+
+  #surprise {
+    position: relative;
+    z-index: 10;
+  }
 </style>
+
 </head>
 <body>
-
-<audio id="bgMusic" src="Arushi.mp3" preload="auto" loop></audio>
 
 <canvas id="confetti"></canvas>
 
@@ -95,4 +103,220 @@
   <p id="message">Enter the secret password to unlock your surprise 😘</p>
 
   <div class="controls" id="controls">
-    <input id="pass" type="pass
+    <input id="pass" type="password" placeholder="Enter password" aria-label="password">
+    <button id="unlockBtn" type="button">Unlock 🎁</button>
+  </div>
+
+  <div style="margin-top:12px;">
+    <button id="surprise" class="secondary" style="display:none" type="button">Click for a Surprise 🎁</button>
+  </div>
+
+  <div id="finalActions" style="display:none;margin-top:14px;">
+    <div class="final" id="finalMessage">Thanks for celebrating! 🎂</div>
+    <div style="margin-top:10px;"><button id="doneBtn" class="secondary" type="button">Close</button></div>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* Toast */
+const toast = document.getElementById('toast');
+function showToast(text, time=2200){
+  toast.textContent = text;
+  toast.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(()=> toast.classList.remove('show'), time);
+}
+
+/* Elements */
+const unlockBtn = document.getElementById('unlockBtn');
+const surpriseBtn = document.getElementById('surprise');
+const passInput = document.getElementById('pass');
+const card = document.getElementById('card');
+const msgEl = document.getElementById('message');
+const finalActions = document.getElementById('finalActions');
+const finalMessage = document.getElementById('finalMessage');
+const doneBtn = document.getElementById('doneBtn');
+
+/* Robust event handler */
+function handleUnlockEvent(e){
+  e.preventDefault();
+  if(unlockBtn._locked) return;
+  unlockBtn._locked = true;
+  setTimeout(() => unlockBtn._locked = false, 500);
+  passInput.blur();
+  checkPassword();
+}
+
+if(window.PointerEvent){
+  unlockBtn.addEventListener('pointerdown', handleUnlockEvent, {passive:false});
+} else {
+  unlockBtn.addEventListener('touchstart', handleUnlockEvent, {passive:false});
+}
+unlockBtn.addEventListener('click', handleUnlockEvent);
+
+/* Password check */
+function checkPassword(){
+  const val = passInput.value.trim();
+  if(val === 'arushi08'){
+    document.getElementById('controls').style.display = 'none';
+    surpriseBtn.style.display = 'inline-block';
+    startHearts();
+    showToast('Password accepted! Tap surprise 🎉', 1800);
+  } else {
+    showToast('donii naughty — password incorrect 🤭', 1800);
+    card.animate([
+      {transform:'translateX(-6px)'},
+      {transform:'translateX(6px)'},
+      {transform:'translateX(0)'}
+    ], {duration:300});
+  }
+}
+
+/* Hearts */
+let _hearts = [];
+function startHearts(limit = 20){
+  _hearts.forEach(h => h.remove());
+  _hearts = [];
+  const count = Math.min(limit, 14);
+  for(let i=0;i<count;i++){
+    const heart = document.createElement('div');
+    heart.className = 'heart';
+    heart.textContent = '❤️';
+    heart.style.left = (Math.random()*90)+'vw';
+    heart.style.fontSize = (16+Math.random()*18)+'px';
+    const dur = 4+Math.random()*3;
+    heart.style.transition = `top ${dur}s linear, opacity ${dur}s linear, transform ${dur}s linear`;
+    document.body.appendChild(heart);
+    requestAnimationFrame(()=>{
+      heart.style.top = (100+Math.random()*20)+'vh';
+      heart.style.opacity = '0';
+      heart.style.transform = `rotate(${Math.random()*720-360}deg)`;
+    });
+    setTimeout(()=>heart.remove(), (dur+1)*1000);
+    _hearts.push(heart);
+  }
+}
+
+/* Confetti */
+const canvas = document.getElementById('confetti');
+const ctx = canvas.getContext('2d');
+let confetti = [];
+let rafId=null;
+
+function resizeCanvas(){
+  const dpr = Math.max(1,window.devicePixelRatio||1);
+  canvas.width = Math.round(window.innerWidth*dpr);
+  canvas.height = Math.round(window.innerHeight*dpr);
+  canvas.style.width = window.innerWidth+'px';
+  canvas.style.height = window.innerHeight+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+resizeCanvas();
+window.addEventListener('resize',resizeCanvas);
+
+function isLowPower(){
+  const cores = navigator.hardwareConcurrency || 2;
+  const dpr = window.devicePixelRatio || 1;
+  return (cores<=2)||(dpr>2.5&&cores<=4);
+}
+
+function startConfetti(){
+  const base = isLowPower()?40:150;
+  const w = canvas.width/(devicePixelRatio||1);
+  const h = canvas.height/(devicePixelRatio||1);
+  confetti=[];
+  for(let i=0;i<base;i++){
+    confetti.push({
+      x:Math.random()*w,
+      y:Math.random()*h-h,
+      r:Math.random()*6+2,
+      d:Math.random()*1.2+0.6,
+      rot:Math.random()*360,
+      rotSpeed:(Math.random()-0.5)*6,
+      color:`hsl(${Math.random()*360},90%,55%)`
+    });
+  }
+  if(rafId) cancelAnimationFrame(rafId);
+  animateConfetti();
+  startMessages();
+}
+
+function animateConfetti(){
+  const w = canvas.width/(devicePixelRatio||1);
+  const h = canvas.height/(devicePixelRatio||1);
+  ctx.clearRect(0,0,w,h);
+  confetti.forEach(c=>{
+    ctx.save();
+    ctx.translate(c.x,c.y);
+    ctx.rotate(c.rot*Math.PI/180);
+    ctx.fillStyle=c.color;
+    ctx.fillRect(-c.r/1.5,-c.r/2,c.r*2.2,c.r);
+    ctx.restore();
+    c.y+=c.d*3;
+    c.x+=Math.sin(c.y*0.01)*0.8;
+    c.rot+=c.rotSpeed;
+    if(c.y>h+20){c.y=-20;c.x=Math.random()*w;}
+  });
+  rafId=requestAnimationFrame(animateConfetti);
+}
+
+/* Messages */
+const messages=[
+  "You are the most special person in my life 💖",
+  "Your smile makes everything brighter ✨",
+  "Thank you for being YOU 🌻",
+  "Once again love you very much 😘",
+  "Mwuaahhh 😚",
+  "I’m so lucky to have you 🎀",
+  "Happy Birthday once again, my favourite person 🎂💘",
+  "kohomada mn waddek ne 😌",
+  "salman khan wage ne 👀",
+  "waziii ne 😂"
+];
+let msgIdx=0;
+
+function startMessages(){
+  surpriseBtn.style.display='none';
+  showNextMessage();
+}
+
+function showNextMessage(){
+  msgEl.textContent = messages[msgIdx];
+  msgIdx++;
+  if(msgIdx < messages.length){
+    setTimeout(showNextMessage,2500);
+  } else {
+    endMessages();
+  }
+}
+
+function endMessages(){
+  setTimeout(()=>{
+    finalMessage.textContent="Surprise complete — Happy Birthday again! 🎈";
+    finalActions.style.display='block';
+    if(rafId) cancelAnimationFrame(rafId);
+  },700);
+}
+
+/* Surprise button */
+surpriseBtn.addEventListener('click',()=>{
+  startConfetti();
+  showToast('Enjoy the surprise! 🎊',1400);
+});
+
+/* Done button */
+doneBtn.addEventListener('click',()=>location.reload());
+
+/* Enter key */
+passInput.addEventListener('keydown',(e)=>{if(e.key==='Enter')handleUnlockEvent(e);});
+
+/* Clean hearts on exit */
+window.addEventListener('pagehide',()=>{
+  _hearts.forEach(h=>h.remove());
+  if(rafId) cancelAnimationFrame(rafId);
+});
+</script>
+</body>
+</html>
