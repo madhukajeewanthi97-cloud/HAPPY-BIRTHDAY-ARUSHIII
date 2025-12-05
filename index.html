@@ -23,13 +23,13 @@
     background-repeat: no-repeat;
     background-attachment: fixed;
 
-    /* Dark overlay so card stays readable */
     position: relative;
     display:flex;
     align-items:center;
     justify-content:center;
     padding:20px;
     box-sizing:border-box;
+    overflow: hidden;
   }
 
   /* Overlay layer */
@@ -43,7 +43,7 @@
 
   .card{
     position: relative;
-    z-index: 2;
+    z-index: 5;
     background:rgba(255,255,255,0.88);
     backdrop-filter: blur(6px);
     padding:22px;
@@ -52,4 +52,403 @@
     width:100%;
     max-width:420px;
     text-align:center;
-    an
+    animation:pop .6s ease;
+  }
+
+  h1{color:var(--accent);font-size:1.6rem;margin:6px 0}
+  p{color:#444;margin:8px 0 14px;font-size:1rem}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+
+  input[type="password"]{
+    padding:10px;
+    border-radius:10px;
+    border:1px solid #ccc;
+    flex:1;
+    min-width:150px;
+    background: rgba(255,255,255,0.9);
+    color:#000;
+    font-weight:500;
+  }
+  input[type="password"]::placeholder{
+    color:#333;
+    opacity:1;
+  }
+
+  button{
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    padding:10px 14px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:0.95rem;
+  }
+  button.secondary{background:#eee;color:#333}
+  button:active{transform:translateY(1px)}
+
+  canvas{position:fixed;top:0;left:0;pointer-events:none;z-index:6}
+  .heart{position:fixed;top:-10px;font-size:22px;opacity:0.9;pointer-events:none;z-index:7}
+
+  @keyframes pop{from{transform:scale(.85);opacity:0}to{transform:none;opacity:1}}
+
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:24px;background:#222;color:#fff;padding:10px 14px;border-radius:10px;opacity:0;pointer-events:none;transition:all .25s;z-index:60}
+  .toast.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+
+  .final{font-size:1.05rem;color:var(--accent)}
+
+  @media (max-width:360px){
+    h1{font-size:1.3rem}
+    input[type="password"]{min-width:120px}
+  }
+
+  #confetti { pointer-events: none !important; }
+
+  /* Full-screen slideshow overlay */
+  #slideshowOverlay {
+    position: fixed;
+    inset: 0;
+    display: none; /* shown after unlock & surprise */
+    z-index: 20;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.28);
+    padding: 30px;
+  }
+  #slideCard {
+    max-width: 900px;
+    width: 90%;
+    max-height: 90%;
+    background: rgba(255,255,255,0.92);
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .slideImg {
+    max-width: 100%;
+    max-height: 64vh;
+    object-fit: cover;
+    border-radius: 8px;
+    opacity: 0;
+    transition: opacity .9s ease;
+    display:block;
+  }
+  .slideImg.show { opacity: 1; }
+  .slideCaption {
+    margin-top: 12px;
+    font-size: 1.15rem;
+    color: #333;
+    text-align:center;
+    padding: 6px 12px;
+  }
+
+  /* small controls */
+  #slideControls { margin-top: 10px; display:flex; gap:8px; align-items:center; justify-content:center; }
+  #slideIndex { color:#777; font-size:0.95rem; }
+  #skipBtn { background: transparent; border: 1px solid #ddd; padding:6px 10px; border-radius:8px; color:#333; cursor:pointer; }
+
+</style>
+
+</head>
+<body>
+
+<canvas id="confetti"></canvas>
+
+<!-- Main Card -->
+<div class="card" id="card">
+  <h1>🎉 Happy Birthday ARUSHI! 🎂</h1>
+  <p id="message">Enter the secret password to unlock your surprise 😘</p>
+
+  <div class="controls" id="controls">
+    <input id="pass" type="password" placeholder="Enter password" aria-label="password">
+    <button id="unlockBtn" type="button">Unlock 🎁</button>
+  </div>
+
+  <div style="margin-top:12px;">
+    <button id="surprise" class="secondary" style="display:none" type="button">Click for a Surprise 🎁</button>
+  </div>
+
+  <div id="finalActions" style="display:none;margin-top:14px;">
+    <div class="final" id="finalMessage">Thanks for celebrating! 🎂</div>
+    <div style="margin-top:10px;"><button id="doneBtn" class="secondary" type="button">Close</button></div>
+  </div>
+</div>
+
+<!-- Slideshow Overlay (full-screen) -->
+<div id="slideshowOverlay" aria-hidden="true">
+  <div id="slideCard" role="dialog" aria-modal="true" aria-label="Slideshow">
+    <img id="slideImage" class="slideImg" src="" alt="Slideshow photo">
+    <div id="slideCaption" class="slideCaption"></div>
+    <div id="slideControls">
+      <div id="slideIndex"></div>
+      <button id="skipBtn">Skip Slideshow</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* Toast */
+const toast = document.getElementById('toast');
+function showToast(text, time=2200){
+  toast.textContent = text;
+  toast.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(()=> toast.classList.remove('show'), time);
+}
+
+/* Elements */
+const unlockBtn = document.getElementById('unlockBtn');
+const surpriseBtn = document.getElementById('surprise');
+const passInput = document.getElementById('pass');
+const card = document.getElementById('card');
+const msgEl = document.getElementById('message');
+const finalActions = document.getElementById('finalActions');
+const finalMessage = document.getElementById('finalMessage');
+const doneBtn = document.getElementById('doneBtn');
+
+const slideshowOverlay = document.getElementById('slideshowOverlay');
+const slideImage = document.getElementById('slideImage');
+const slideCaption = document.getElementById('slideCaption');
+const slideIndexText = document.getElementById('slideIndex');
+const skipBtn = document.getElementById('skipBtn');
+
+/* Robust event handler */
+function handleUnlockEvent(e){
+  e.preventDefault();
+  if(unlockBtn._locked) return;
+  unlockBtn._locked = true;
+  setTimeout(() => unlockBtn._locked = false, 500);
+  passInput.blur();
+  checkPassword();
+}
+
+if(window.PointerEvent){
+  unlockBtn.addEventListener('pointerdown', handleUnlockEvent, {passive:false});
+} else {
+  unlockBtn.addEventListener('touchstart', handleUnlockEvent, {passive:false});
+}
+unlockBtn.addEventListener('click', handleUnlockEvent);
+
+/* Password check */
+function checkPassword(){
+  const val = passInput.value.trim();
+  if(val === 'arushi08'){
+    document.getElementById('controls').style.display = 'none';
+    surpriseBtn.style.display = 'inline-block';
+    startHearts();
+    showToast('Password accepted! Tap surprise 🎉', 1400);
+  } else {
+    showToast('donii naughty — password incorrect 🤭', 1400);
+    card.animate([
+      {transform:'translateX(-6px)'},
+      {transform:'translateX(6px)'},
+      {transform:'translateX(0)'}
+    ], {duration:300});
+  }
+}
+
+/* Hearts */
+let _hearts = [];
+function startHearts(limit = 20){
+  _hearts.forEach(h => h.remove());
+  _hearts = [];
+  const count = Math.min(limit, 14);
+  for(let i=0;i<count;i++){
+    const heart = document.createElement('div');
+    heart.className = 'heart';
+    heart.textContent = '❤️';
+    heart.style.left = (Math.random()*90)+'vw';
+    heart.style.fontSize = (16+Math.random()*18)+'px';
+    const dur = 4+Math.random()*3;
+    heart.style.transition = `top ${dur}s linear, opacity ${dur}s linear, transform ${dur}s linear`;
+    document.body.appendChild(heart);
+    requestAnimationFrame(()=>{
+      heart.style.top = (100+Math.random()*20)+'vh';
+      heart.style.opacity = '0';
+      heart.style.transform = `rotate(${Math.random()*720-360}deg)`;
+    });
+    setTimeout(()=>heart.remove(), (dur+1)*1000);
+    _hearts.push(heart);
+  }
+}
+
+/* Confetti (keeps working while slideshow shows) */
+const canvas = document.getElementById('confetti');
+const ctx = canvas.getContext('2d');
+let confetti = [];
+let rafId=null;
+function resizeCanvas(){
+  const dpr = Math.max(1,window.devicePixelRatio||1);
+  canvas.width = Math.round(window.innerWidth*dpr);
+  canvas.height = Math.round(window.innerHeight*dpr);
+  canvas.style.width = window.innerWidth+'px';
+  canvas.style.height = window.innerHeight+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+resizeCanvas();
+window.addEventListener('resize',resizeCanvas);
+
+function isLowPower(){
+  const cores = navigator.hardwareConcurrency || 2;
+  const dpr = window.devicePixelRatio || 1;
+  return (cores<=2)||(dpr>2.5&&cores<=4);
+}
+
+function startConfetti(){
+  const base = isLowPower()?40:150;
+  const w = canvas.width/(devicePixelRatio||1);
+  const h = canvas.height/(devicePixelRatio||1);
+  confetti=[];
+  for(let i=0;i<base;i++){
+    confetti.push({
+      x:Math.random()*w,
+      y:Math.random()*h-h,
+      r:Math.random()*6+2,
+      d:Math.random()*1.2+0.6,
+      rot:Math.random()*360,
+      rotSpeed:(Math.random()-0.5)*6,
+      color:`hsl(${Math.random()*360},90%,55%)`
+    });
+  }
+  if(rafId) cancelAnimationFrame(rafId);
+  animateConfetti();
+}
+
+function animateConfetti(){
+  const w = canvas.width/(devicePixelRatio||1);
+  const h = canvas.height/(devicePixelRatio||1);
+  ctx.clearRect(0,0,w,h);
+  confetti.forEach(c=>{
+    ctx.save();
+    ctx.translate(c.x,c.y);
+    ctx.rotate(c.rot*Math.PI/180);
+    ctx.fillStyle=c.color;
+    ctx.fillRect(-c.r/1.5,-c.r/2,c.r*2.2,c.r);
+    ctx.restore();
+    c.y+=c.d*3;
+    c.x+=Math.sin(c.y*0.01)*0.8;
+    c.rot+=c.rotSpeed;
+    if(c.y>h+20){c.y=-20;c.x=Math.random()*w;}
+  });
+  rafId=requestAnimationFrame(animateConfetti);
+}
+
+/* Messages (existing) */
+const messages=[
+  "You are the most special person in my life 💖",
+  "Your smile makes everything brighter ✨",
+  "Thank you for being YOU 🌻",
+  "Once again love you very much 😘",
+  "Mwuaahhh 😚",
+  "I’m so lucky to have you 🎀",
+  "Happy Birthday once again, my favourite person 🎂💘",
+  "kohomada mn waddek ne 😌",
+  "salman khan wage ne 👀",
+  "waziii ne 😂"
+];
+
+/* Slideshow images (uploaded to repo as slide1.jpg ... slide6.jpg) */
+const slides = [
+  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide1.jpg",
+  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide2.jpg",
+  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide3.jpg",
+  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide4.jpg",
+  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide5.jpg",
+  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide6.jpg"
+];
+
+let slideTimer = null;
+let msgIdx = 0;
+
+/* Start the slideshow sequence (uses existing messages array) */
+function startSlideshow(){
+  // show overlay
+  slideshowOverlay.style.display = 'flex';
+  slideshowOverlay.setAttribute('aria-hidden','false');
+  msgIdx = 0;
+  showNextSlide();
+}
+
+/* Show next slide + message */
+function showNextSlide(){
+  if(msgIdx >= messages.length){
+    // finished all messages -> end
+    endSlideshow();
+    return;
+  }
+
+  const slideIdx = msgIdx % slides.length;
+  slideImage.classList.remove('show');
+  // preload then show
+  slideImage.src = slides[slideIdx] + '?v=' + Date.now(); // cache-bust for quick updates if needed
+  slideCaption.textContent = messages[msgIdx];
+  slideIndexText.textContent = `${msgIdx + 1} / ${messages.length}`;
+
+  // Wait image to load to fade-in nicely
+  slideImage.onload = () => {
+    // small delay to ensure transition triggers
+    requestAnimationFrame(()=> {
+      slideImage.classList.add('show');
+    });
+  };
+
+  // schedule next
+  clearTimeout(slideTimer);
+  slideTimer = setTimeout(()=>{
+    msgIdx++;
+    showNextSlide();
+  }, 2500); // 2.5s per slide
+}
+
+/* End slideshow and reveal final actions */
+function endSlideshow(){
+  clearTimeout(slideTimer);
+  slideshowOverlay.style.display = 'none';
+  slideshowOverlay.setAttribute('aria-hidden','true');
+
+  finalMessage.textContent="Surprise complete — Happy Birthday again! LOVE YOU UMMAH 🎈";
+  finalActions.style.display='block';
+  // stop confetti animation loop
+  if(rafId) {
+    cancelAnimationFrame(rafId);
+    rafId = null;
+  }
+}
+
+/* Surprise button now starts confetti + slideshow */
+surpriseBtn.addEventListener('click',()=>{
+  // Hide the small surprise button and start the surprises
+  surpriseBtn.style.display = 'none';
+  startConfetti();
+  showToast('Enjoy the surprise! 🎊',1200);
+  // slight delay so confetti appears before slideshow
+  setTimeout(()=> startSlideshow(), 450);
+});
+
+/* Skip slideshow button */
+skipBtn.addEventListener('click', ()=>{
+  endSlideshow();
+});
+
+/* Done button */
+doneBtn.addEventListener('click',()=> location.reload());
+
+/* Enter key */
+passInput.addEventListener('keydown',(e)=>{if(e.key==='Enter')handleUnlockEvent(e);});
+
+/* Clean hearts & cancel animations on exit */
+window.addEventListener('pagehide',()=>{
+  _hearts.forEach(h=>h.remove());
+  if(rafId) cancelAnimationFrame(rafId);
+  clearTimeout(slideTimer);
+});
+</script>
+</body>
+</html>
