@@ -1,311 +1,215 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Birthday Surprise — Debug Build</title>
-  <style>
-    :root{ --accent:#ff4e50; --bg:#f7f7f7; }
-    html,body{ margin:0; padding:0; height:100%; font-family:system-ui,-apple-system,Segoe UI,Roboto,'Poppins',sans-serif; background:var(--bg); }
-    .wrap{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; box-sizing:border-box; }
-    .card{
-      width:100%; max-width:860px; background:#fff; border-radius:12px; padding:18px; box-shadow:0 10px 30px rgba(0,0,0,0.08);
-    }
-    header{ display:flex; gap:12px; align-items:center; justify-content:space-between; }
-    h1{ margin:0; color:var(--accent); font-size:1.25rem; }
-    .controls{ display:flex; gap:8px; align-items:center; margin-top:12px; flex-wrap:wrap; }
-    input[type=password]{ padding:10px; border-radius:8px; border:1px solid #ddd; min-width:220px; font-size:1rem; }
-    button{ background:var(--accent); color:#fff; border:none; padding:10px 12px; border-radius:8px; cursor:pointer; }
-    button.secondary{ background:#eee; color:#333; border:1px solid #ddd; }
-    #slideshowOverlay{ display:none; position:fixed; inset:0; z-index:60; align-items:center; justify-content:center; background:rgba(0,0,0,0.5); }
-    #slideCard{ width:92%; max-width:920px; background:#fff; padding:16px; border-radius:12px; text-align:center; box-shadow:0 18px 50px rgba(0,0,0,0.45); }
-    .slideImg{ max-width:100%; max-height:68vh; border-radius:8px; opacity:0; transition:opacity .6s; display:block; margin:0 auto 10px; }
-    .slideImg.show{ opacity:1; }
-    #slideCaption{ min-height:2.2em; color:#222; font-size:1rem; }
-    #finalActions{ display:none; margin-top:10px; }
-    .debug{ margin-top:14px; font-family:monospace; font-size:0.85rem; background:#111; color:#0f0; padding:10px; border-radius:8px; height:160px; overflow:auto; }
-    .statusLine.fail{ color:#ff8b8b; }
-    .statusLine.ok{ color:#9ef59e; }
-    .small{ font-size:0.85rem; color:#666; margin-top:6px; }
-    @media (max-width:540px){ .controls{ flex-direction:column; align-items:stretch } input[type=password]{ width:100% } }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday Arushi 🎂💖</title>
+
+<style>
+:root{
+  --accent:#ff4e50;
+}
+html,body{
+  height:100%; margin:0; padding:0;
+  font-family:'Poppins',sans-serif;
+  background:linear-gradient(135deg,#ff9a9e,#fad0c4);
+  overflow:hidden;
+}
+.center{
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  height:100%;
+  text-align:center;
+  padding:20px;
+}
+h1{ color:#fff; font-size:1.7rem; margin-bottom:20px; }
+input{
+  padding:12px; border-radius:8px; border:none;
+  outline:none; width:220px; font-size:1rem;
+}
+button{
+  margin-top:15px;
+  background:var(--accent);
+  border:none; color:#fff;
+  padding:12px 20px;
+  border-radius:10px;
+  font-size:1rem; cursor:pointer;
+}
+#surpriseBtn{ display:none; }
+#toast{
+  position:absolute; bottom:20px; left:50%;
+  transform:translateX(-50%);
+  background:#000a; color:#fff;
+  padding:8px 14px; border-radius:8px;
+  opacity:0; transition:opacity .4s;
+}
+#toast.show{ opacity:1; }
+
+/* Slideshow overlay */
+#slideshowOverlay{
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,.55);
+  align-items:center; justify-content:center;
+  z-index:20;
+}
+.slideCard{
+  background:#fff; border-radius:12px;
+  padding:16px; width:92%; max-width:900px;
+  text-align:center;
+  box-shadow:0 18px 50px rgba(0,0,0,0.45);
+}
+.slideImg{
+  max-width:100%; max-height:70vh;
+  border-radius:10px;
+  opacity:0; transition:opacity .6s;
+}
+.slideImg.show{ opacity:1; }
+#slideCaption{
+  margin-top:10px; font-size:1.05rem; color:#333;
+  min-height:2.1em;
+}
+
+/* Final message */
+#finalActions{
+  display:none;
+  color:#fff; font-size:1.2rem; font-weight:600;
+}
+#doneBtn{
+  background:#fff; color:#000; font-weight:600;
+  margin-top:20px;
+}
+
+/* Falling hearts */
+.heart{
+  position:fixed; top:-20px;
+  color:#ff105f;
+  font-size:24px;
+  animation:fall linear forwards;
+  pointer-events:none;
+}
+@keyframes fall{
+  to{ transform:translateY(110vh); opacity:0; }
+}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <header>
-        <h1>🎉 Happy Birthday ARUSHI!</h1>
-        <div class="small">Debug build — shows event log below</div>
-      </header>
 
-      <p id="message">Enter the secret password to unlock your surprise 😘</p>
+<div class="center" id="main">
+  <h1>🎉 Happy Birthday ARUSHI! 🎉</h1>
+  <input id="pass" type="password" placeholder="Enter password 😘">
+  <button id="unlockBtn">Unlock 🎁</button>
+  <button id="surpriseBtn">Click for Surprise ❤️</button>
+</div>
 
-      <div class="controls" aria-hidden="false">
-        <input id="pass" type="password" placeholder="Enter password (try arushi08)">
-        <button id="unlockBtn">Unlock 🎁</button>
-        <button id="surpriseBtn" class="secondary" style="display:none">Click for Surprise 🎁</button>
-        <button id="resetBtn" class="secondary">Reset</button>
-      </div>
+<div id="toast"></div>
 
-      <div id="finalActions">
-        <p id="finalMsg" style="color:var(--accent)"></p>
-        <button id="doneBtn" class="secondary">Close / Reload</button>
-      </div>
-
-      <div class="small" style="margin-top:12px">
-        Slides used (edit these URLs in the file if you want your own). The debug log below shows loading status.
-      </div>
-
-      <div style="margin-top:12px">
-        <div style="font-weight:600">Debug Log</div>
-        <div id="debug" class="debug" aria-live="polite"></div>
-      </div>
-    </div>
+<!-- Slideshow -->
+<div id="slideshowOverlay">
+  <div class="slideCard">
+    <img id="slideImage" class="slideImg" src="">
+    <div id="slideCaption"></div>
   </div>
+</div>
 
-  <!-- Slideshow overlay -->
-  <div id="slideshowOverlay">
-    <div id="slideCard">
-      <img id="slideImage" class="slideImg" src="" alt="Slide image">
-      <div id="slideCaption"></div>
-    </div>
-  </div>
+<!-- Final Message -->
+<div class="center" id="finalActions">
+  <div id="finalMsg">Happy Birthday again LOVE YOU UMMAH 🎈💖</div>
+  <button id="doneBtn">Close & Replay</button>
+</div>
 
 <script>
-/* ---------------------------
-   Robust Debug Birthday Script
-   ---------------------------
-   - Paste this entire file as .html and open in browser.
-   - Password: arushi08
-   - If anything fails, read the debug box below.
-*/
+// Elements
+const passInput = document.getElementById("pass");
+const unlockBtn = document.getElementById("unlockBtn");
+const surpriseBtn = document.getElementById("surpriseBtn");
+const toast = document.getElementById("toast");
+const main = document.getElementById("main");
+const slideshow = document.getElementById("slideshowOverlay");
+const slideImg = document.getElementById("slideImage");
+const slideCaption = document.getElementById("slideCaption");
+const finalActions = document.getElementById("finalActions");
 
-(function(){
-  // DOM Helpers + Debug logger (writes into the page so user doesn't need DevTools)
-  const debugEl = document.getElementById('debug');
-  function log(msg, cls){
-    const time = new Date().toLocaleTimeString();
-    const line = document.createElement('div');
-    line.className = 'statusLine ' + (cls||'');
-    line.textContent = `[${time}] ${msg}`;
-    debugEl.appendChild(line);
-    debugEl.scrollTop = debugEl.scrollHeight;
-    // also print to console for developer inspection
-    if(cls === 'fail') console.error(msg); else console.log(msg);
-  }
+// SLIDES
+const slides=[
+ "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide1.jpg",
+ "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide2.jpg",
+ "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide3.jpg",
+ "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide4.jpg",
+ "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide5.jpg",
+ "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide6.jpg",
+ "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide7.jpg",
+ "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide8.jpg",
+ "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide9.jpg",
+ "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide10.jpg"
+];
 
-  // Elements
-  const passInput = document.getElementById('pass');
-  const unlockBtn = document.getElementById('unlockBtn');
-  const surpriseBtn = document.getElementById('surpriseBtn');
-  const resetBtn = document.getElementById('resetBtn');
-  const doneBtn = document.getElementById('doneBtn');
-  const slideshow = document.getElementById('slideshowOverlay');
-  const slideImg = document.getElementById('slideImage');
-  const slideCaption = document.getElementById('slideCaption');
-  const finalActions = document.getElementById('finalActions');
-  const finalMsg = document.getElementById('finalMsg');
+const messages=[
+ "You are the most special person in my life 💖",
+ "Your smile makes everything brighter ✨",
+ "Thank you for being YOU 🌻",
+ "Once again love you very much 😘",
+ "Mwuaahhh😚",
+ "I’m so lucky to have you 🎀",
+ "Happy Birthday once again my favourite person 🎂💘",
+ "menna waddek innava😌",
+ "Piggy kenek wage👀",
+ "cuteeeeeeee😘💘"
+];
 
-  // Embedded tiny placeholder base64 so slideshow never breaks offline (1x1 pinkish)
-  const placeholder = "data:image/svg+xml;base64," + btoa(
-    `<svg xmlns='http://www.w3.org/2000/svg' width='800' height='450'><rect width='100%' height='100%' fill='#ffe9ef'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='26' fill='#ff4e50'>Image not available</text></svg>`
-  );
+// Toast
+function showToast(t){
+ toast.textContent = t;
+ toast.classList.add("show");
+ setTimeout(()=>toast.classList.remove("show"),1800);
+}
 
-  // SLIDES: update these to your own images if you want. Using full https links is recommended.
-  const slides = [
-    // example remote images (raw.githubusercontent.com often works). Replace as needed.
-    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide1.jpg",
-    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide2.jpg",
-    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide3.jpg",
-    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide4.jpg",
-    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide5.jpg",
-    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide6.jpg",
-    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide7.jpg",
-    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide8.jpg",
-    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide9.jpg",
-    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide10.jpg"
-  ];
+// Password unlock
+unlockBtn.onclick=()=>{
+ if(passInput.value==="arushi08"){
+  showToast("Correct password 😘");
+  passInput.style.display="none";
+  unlockBtn.style.display="none";
+  surpriseBtn.style.display="block";
+ }else{
+  showToast("Wrong password Naughty 🤭");
+ }
+};
 
-  const messages = [
-    "You are the most special person in my life 💖",
-    "Your smile makes everything brighter ✨",
-    "Thank you for being YOU 🌻",
-    "Once again love you very much 😘",
-    "Mwuaahhh😚",
-    "I’m so lucky to have you 🎀",
-    "Happy Birthday once again my favourite person 🎂💘",
-    "menna waddek innava😌",
-    "piggy kenek wage👀",
-    "cuteeeeeeee😘💘"
-  ];
+// Hearts falling
+function dropHeart(){
+ const heart=document.createElement("div");
+ heart.className="heart";
+ heart.textContent="❤️";
+ heart.style.left=Math.random()*100+"vw";
+ heart.style.animationDuration=(4+Math.random()*3)+"s";
+ document.body.appendChild(heart);
+ setTimeout(()=>heart.remove(),6000);
+}
 
-  // State
-  let index = 0, timer = null, preloaded = [];
+// Slideshow
+let i=0;
+function next(){
+ if(i>=slides.length){
+  slideshow.style.display="none";
+  finalActions.style.display="flex";
+  return;
+ }
+ slideImg.classList.remove("show");
+ slideImg.src=slides[i];
+ slideCaption.textContent=messages[i];
+ slideImg.onload=()=>requestAnimationFrame(()=>slideImg.classList.add("show"));
+ i++;
+ setTimeout(next,2500);
+}
 
-  // Utility: preload images and report results in debug
-  function preloadAllImages(list, cb){
-    log("Starting preload of " + list.length + " images...");
-    let done = 0;
-    list.forEach((url, i) => {
-      const img = new Image();
-      img.onload = () => {
-        preloaded[i] = { ok: true, url };
-        log(`Preload OK [${i}] ${url}`);
-        done++; if(done === list.length) cb && cb(preloaded);
-      };
-      img.onerror = (e) => {
-        preloaded[i] = { ok: false, url };
-        log(`Preload FAIL [${i}] ${url}`, 'fail');
-        done++; if(done === list.length) cb && cb(preloaded);
-      };
-      // Start load
-      try {
-        img.src = url;
-      } catch (err){
-        preloaded[i] = { ok: false, url };
-        log(`Exception while preloading [${i}] ${url}: ${err}`, 'fail');
-        done++; if(done === list.length) cb && cb(preloaded);
-      }
-      // after 6s, if not loaded mark as fail (network hang cases)
-      setTimeout(() => {
-        if(!preloaded[i]){
-          preloaded[i] = { ok:false, url };
-          log(`Preload TIMEOUT [${i}] ${url}`, 'fail');
-          done++; if(done === list.length) cb && cb(preloaded);
-        }
-      }, 6000);
-    });
-  }
+surpriseBtn.onclick=()=>{
+ main.style.display="none";
+ slideshow.style.display="flex";
+ i=0; next();
+ setInterval(dropHeart,300);
+};
 
-  // Show toast-like inline debug message (in debug box)
-  function showStatus(msg){
-    log(msg, 'ok');
-  }
-
-  // Wiring: unlock button / enter
-  function tryUnlock(){
-    const v = (passInput.value || '').trim();
-    log("Unlock clicked — value length: " + v.length);
-    if(v === "arushi08"){
-      showStatus("Password correct. Unlocking...");
-      unlockBtn.style.display = "none";
-      passInput.style.display = "none";
-      surpriseBtn.style.display = "inline-block";
-      surpriseBtn.focus();
-      // start preloading in background so slideshow is smoother
-      preloadAllImages(slides, (results)=> {
-        log("Preload finished. Good: " + results.filter(r => r.ok).length + " / " + results.length);
-      });
-    } else {
-      log("Password incorrect.", "fail");
-    }
-  }
-
-  // Enter key
-  passInput.addEventListener('keydown', function(e){
-    if(e.key === 'Enter') tryUnlock();
-  });
-  unlockBtn.addEventListener('click', tryUnlock);
-
-  // Reset button
-  resetBtn.addEventListener('click', function(){
-    log("User requested reset. Reloading page.");
-    location.reload();
-  });
-
-  // Slideshow functions
-  function resetSlideshow(){
-    index = 0;
-    clearTimeout(timer);
-    slideImg.classList.remove('show');
-    slideImg.src = '';
-    slideCaption.textContent = '';
-  }
-
-  function stopSlideshowAndShowFinal(msg){
-    clearTimeout(timer);
-    slideshow.style.display = 'none';
-    finalActions.style.display = 'block';
-    finalMsg.textContent = msg || "Hope you liked it ❤️";
-    log("Slideshow ended: " + msg);
-  }
-
-  function nextSlide(){
-    if(index >= slides.length){
-      stopSlideshowAndShowFinal("Happy Birthday again LOVE YOU UMMAH 🎈");
-      return;
-    }
-
-    const url = slides[index];
-    const caption = messages[index] || "";
-    log(`Showing slide ${index} → ${url}`);
-
-    // attach handlers
-    slideImg.onload = function(){
-      // small frame to allow transition
-      requestAnimationFrame(()=> slideImg.classList.add('show'));
-      log(`Image loaded OK [${index}]`);
-    };
-    slideImg.onerror = function(){
-      log(`Image load FAILED [${index}] ${url}`, 'fail');
-      // show placeholder so user still sees something
-      slideImg.src = placeholder;
-      // still show caption and continue
-      slideCaption.textContent = caption + " (image failed — placeholder shown)";
-    };
-
-    // Set src (if preloaded flagged as fail, jump to placeholder immediately)
-    if(preloaded[index] && preloaded[index].ok === false){
-      log(`Using placeholder for slide ${index} because preload previously failed.`, 'fail');
-      slideImg.src = placeholder;
-      slideCaption.textContent = caption + " (placeholder)";
-      // simulate load show
-      requestAnimationFrame(()=> slideImg.classList.add('show'));
-    } else {
-      slideImg.classList.remove('show');
-      slideImg.src = url;
-      slideCaption.textContent = caption;
-    }
-
-    index++;
-    // move to next after 2.4s
-    timer = setTimeout(nextSlide, 2400);
-  }
-
-  // Surprise button starts slideshow
-  surpriseBtn.addEventListener('click', function(){
-    log("Surprise clicked — starting slideshow");
-    surpriseBtn.style.display = 'none';
-    finalActions.style.display = 'none';
-    resetSlideshow();
-    slideshow.style.display = 'flex';
-    // small delay for overlay paint
-    setTimeout(nextSlide, 120);
-  });
-
-  // Clicking outside slideCard will stop slideshow
-  slideshow.addEventListener('click', function(e){
-    if(e.target === slideshow){
-      log("Overlay clicked outside image — ending slideshow early");
-      stopSlideshowAndShowFinal("Ended early — hope you enjoyed the preview ❤️");
-    }
-  });
-
-  // Done button (if present) reloads
-  if(doneBtn){
-    doneBtn.addEventListener('click', function(){
-      log("Done clicked — reloading.");
-      location.reload();
-    });
-  }
-
-  // On initial load show some helpful debug context
-  log("Script loaded. UI ready.");
-  log("Slides count: " + slides.length);
-  log("If images don't load, try: 1) open page with a web server (not file://) 2) check URLs 3) check network or GitHub raw blocking.");
-  // Preload can be started on unlock only. Optionally start preload immediately:
-  // preloadAllImages(slides, ()=> log("Initial preload finished."));
-})();
+document.getElementById("doneBtn").onclick=()=>location.reload();
 </script>
 </body>
 </html>
