@@ -4,144 +4,161 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Birthday Surprise 🎉</title>
+
 <style>
-  :root{ --accent: #ff4e50; }
+:root{
+  --accent:#ff4e50;
+}
+html,body{
+  margin:0; padding:0;
+  height:100%;
+  font-family: 'Poppins', sans-serif;
+}
+body{
+  background-image:url("bg.png");
+  background-size:cover;
+  background-position:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  position:relative;
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.35);
+  z-index:0;
+}
 
-  html,body{
-    height:100%; margin:0;
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, 'Poppins', sans-serif;
-  }
+.card{
+  position:relative;
+  background:rgba(255,255,255,0.88);
+  border-radius:14px;
+  z-index:5;
+  text-align:center;
+  padding:20px;
+  width:90%;
+  max-width:420px;
+  animation:pop .6s ease;
+}
+@keyframes pop{from{opacity:0;transform:scale(.8);}to{opacity:1;transform:scale(1);}}
 
-  body{
-    background-image: url("https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/bg.png");
-    background-size: cover; background-position: center; background-repeat: no-repeat;
-    display:flex; align-items:center; justify-content:center;
-    padding:20px; box-sizing:border-box; overflow:hidden; position:relative;
-  }
+h1{color:var(--accent);margin:6px 0;}
+p{color:#333;margin:8px 0 12px;}
 
-  body::before{
-    content:""; position:fixed; inset:0;
-    background:rgba(0,0,0,0.45);
-    z-index:0;
-  }
+input{
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  width:60%;
+}
+button{
+  background:var(--accent);
+  border:none;
+  padding:10px 14px;
+  border-radius:10px;
+  color:#fff;
+  cursor:pointer;
+}
+button.secondary{
+  background:#eee;
+  color:#333;
+}
+.toast{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#222;
+  color:#fff;
+  padding:10px 14px;
+  border-radius:10px;
+  opacity:0;
+  transition:.3s;
+  z-index:50;
+}
+.toast.show{opacity:1;}
 
-  .card{
-    position:relative; z-index:5;
-    background:rgba(255,255,255,0.88);
-    backdrop-filter:blur(6px);
-    padding:22px; border-radius:14px;
-    max-width:420px; width:100%; text-align:center;
-    box-shadow:0 10px 25px rgba(0,0,0,0.18);
-  }
-
-  button{
-    background:var(--accent); color:#fff;
-    border:none; padding:10px 16px; border-radius:10px; cursor:pointer;
-  }
-  button.secondary{ background:#eee; color:#333 }
-
-  #confetti{ position:fixed; top:0; left:0; z-index:6; pointer-events:none; }
-  .toast{
-    position:fixed; left:50%; bottom:24px; transform:translateX(-50%);
-    background:#000; color:#fff; padding:10px 14px; border-radius:10px;
-    opacity:0; transition:opacity .25s; z-index:50; pointer-events:none;
-  }
-  .toast.show{ opacity:1; }
-
-  #slideshowOverlay{
-    position:fixed; inset:0;
-    background:rgba(0,0,0,0.35);
-    display:none; align-items:center; justify-content:center;
-    padding:20px; z-index:20;
-  }
-  #slideCard{
-    background:rgba(255,255,255,0.95);
-    padding:18px; border-radius:12px;
-    display:flex; flex-direction:column; align-items:center;
-    max-width:900px; width:90%;
-  }
-  #slideImage{
-    max-width:100%; max-height:65vh; border-radius:10px;
-    opacity:0; transition:opacity .8s;
-  }
-  #slideImage.show{ opacity:1; }
+#slideshowOverlay{
+  position:fixed;
+  inset:0;
+  display:none;
+  z-index:20;
+  background:rgba(0,0,0,0.3);
+  align-items:center;
+  justify-content:center;
+}
+#slideCard{
+  background:#fff;
+  padding:18px;
+  border-radius:14px;
+  max-width:900px;
+  width:90%;
+  text-align:center;
+}
+.slideImg{
+  max-width:100%;
+  max-height:70vh;
+  opacity:0;
+  border-radius:10px;
+  transition:opacity .9s ease;
+}
+.slideImg.show{opacity:1;}
 </style>
+
 </head>
 <body>
 
 <audio id="bgMusic" preload="auto">
-  <source src="https://github.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/raw/refs/heads/main/Arushi.mp3" type="audio/mpeg">
+  <source src="Arushi.mp3" type="audio/mpeg">
 </audio>
 
-<canvas id="confetti"></canvas>
-
 <div class="card" id="card">
-  <h2>🎉 Happy Birthday ARUSHI! 🎂</h2>
+  <h1>🎉 Happy Birthday ARUSHI! 🎂</h1>
   <p id="message">Enter the secret password to unlock your surprise 😘</p>
 
-  <div id="controls" style="display:flex; gap:8px; justify-content:center;">
-    <input id="pass" type="password" placeholder="Enter password" style="flex:1; padding:10px; border-radius:10px;">
-    <button id="unlockBtn">Unlock 🎁</button>
-  </div>
+  <input id="pass" type="password" placeholder="Enter password">
+  <button id="unlockBtn">Unlock 🎁</button>
 
-  <button id="surprise" class="secondary" style="display:none; margin-top:10px;">Click for a Surprise 🎁</button>
+  <button id="surpriseBtn" class="secondary" style="display:none;margin-top:12px">Click for Surprise 🎁</button>
 
-  <div id="finalActions" style="display:none; margin-top:14px;">
-    <div id="finalMessage" class="final"></div>
+  <div id="finalActions" style="display:none;margin-top:14px;">
+    <p style="color:var(--accent);" id="finalMsg"></p>
     <button id="doneBtn" class="secondary" style="margin-top:10px;">Close</button>
   </div>
 </div>
 
 <div id="slideshowOverlay">
   <div id="slideCard">
-    <img id="slideImage" src="">
-    <p id="slideCaption" style="margin-top:10px; font-size:1.15rem;"></p>
+    <img id="slideImage" class="slideImg" src="">
+    <div id="slideCaption"></div>
   </div>
 </div>
 
 <div id="toast" class="toast"></div>
 
 <script>
-/* Toast */
-const toast = document.getElementById("toast");
-function showToast(msg){
-  toast.textContent = msg;
-  toast.classList.add("show");
-  clearTimeout(showToast.t);
-  showToast.t = setTimeout(()=>toast.classList.remove("show"),1600);
-}
-
-/* Elements */
-const unlockBtn = document.getElementById("unlockBtn");
-const surpriseBtn = document.getElementById("surprise");
-const passInput = document.getElementById("pass");
-const card = document.getElementById("card");
-
-/* Password Unlock */
-unlockBtn.addEventListener("click", ()=>{
-  if(passInput.value.trim() === "arushi08"){
-    document.getElementById("controls").style.display = "none";
-    surpriseBtn.style.display = "inline-block";
-    showToast("Correct password 😘");
-  } else {
-    showToast("Wrong password 🤭");
-    card.animate([{transform:"translateX(-6px)"},{transform:"translateX(6px)"},{transform:"translateX(0)"}],{duration:300});
-  }
-});
-
-/* Music */
+// Elements
 const music = document.getElementById("bgMusic");
-function playMusic(){
-  music.volume = 0.7;
-  music.play().catch(()=>{});
-}
-
-/* Slideshow */
+const unlockBtn = document.getElementById("unlockBtn");
+const surpriseBtn = document.getElementById("surpriseBtn");
+const passInput = document.getElementById("pass");
+const toast = document.getElementById("toast");
 const slideshow = document.getElementById("slideshowOverlay");
 const slideImg = document.getElementById("slideImage");
 const slideCaption = document.getElementById("slideCaption");
 
-const messages = [
+// Toast
+function showToast(t){
+  toast.textContent=t;
+  toast.classList.add("show");
+  setTimeout(()=>toast.classList.remove("show"),1800);
+}
+
+// Message list
+const messages=[
   "You are the most special person in my life 💖",
   "Your smile makes everything brighter ✨",
   "Thank you for being YOU 🌻",
@@ -151,48 +168,58 @@ const messages = [
   "Happy Birthday once again my favourite person 🎂💘",
   "menna waddek innava😌",
   "piggy kenek wage👀",
-  "cuteeeeeeee😘💘"
+  "cuteeeeeeee😘💘",
 ];
 
-const slides = [
-  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide1.jpg",
-  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide2.jpg",
-  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide3.jpg",
-  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide4.jpg",
-  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide5.jpg",
-  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide6.jpg",
-  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide7.jpg",
-  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide8.jpg",
-  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide9.jpg",
-  "https://cdn.jsdelivr.net/gh/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/slide10.jpg"
+// Slides
+const slides=[
+  "slide1.jpg","slide2.jpg","slide3.jpg","slide4.jpg","slide5.jpg",
+  "slide6.jpg","slide7.jpg","slide8.jpg","slide9.jpg","slide10.jpg"
 ];
 
-let index = 0;
-function showSlide(){
+// Unlock button
+unlockBtn.onclick = ()=>{
+  if(passInput.value === "arushi08"){
+    showToast("Correct password 😘");
+    surpriseBtn.style.display="inline-block";
+    unlockBtn.style.display="none";
+    passInput.style.display="none";
+  } else {
+    showToast("Wrong password naughty 🤭");
+  }
+};
+
+// Slideshow + music
+let index=0;
+function playMusic(){
+  music.volume = 1.0;  // 💥 LOUD
+  music.play().catch(()=>{});
+}
+
+function nextSlide(){
   if(index >= messages.length){
     slideshow.style.display="none";
     document.getElementById("finalActions").style.display="block";
-    document.getElementById("finalMessage").textContent = "Happy Birthday again! LOVE YOU UMMAH 🎈";
+    document.getElementById("finalMsg").textContent="Happy Birthday again LOVE YOU UMMAH 🎈";
     return;
   }
   slideImg.classList.remove("show");
   slideImg.src = slides[index];
   slideCaption.textContent = messages[index];
-  slideImg.onload = ()=>slideImg.classList.add("show");
+  slideImg.onload = ()=> requestAnimationFrame(()=> slideImg.classList.add("show"));
   index++;
-  setTimeout(showSlide,2500);
+  setTimeout(nextSlide,2500);
 }
 
-surpriseBtn.addEventListener("click", ()=>{
+surpriseBtn.onclick = ()=>{
+  playMusic(); // 🔊 starts here
   surpriseBtn.style.display="none";
-  showToast("Enjoy the surprise! 🎊");
-  playMusic();
   slideshow.style.display="flex";
-  showSlide();
-});
+  nextSlide();
+};
 
-/* Close */
-document.getElementById("doneBtn").onclick = ()=>location.reload();
+document.getElementById("doneBtn").onclick = ()=> location.reload();
 </script>
+
 </body>
 </html>
