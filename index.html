@@ -1,228 +1,285 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Birthday Surprise 🎉</title>
+  <style>
+    :root{ --accent:#ff4e50; }
+    html,body{ margin:0; padding:0; height:100%; font-family:'Poppins',sans-serif; }
+    body{
+      background-image:url("bg.png");
+      background-size:cover;
+      background-position:center;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      position:relative;
+    }
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.35);
+      z-index:0;
+    }
 
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Birthday Surprise 🎉</title>
+    .card{
+      position:relative;
+      background:rgba(255,255,255,0.95);
+      border-radius:14px;
+      z-index:5;
+      text-align:center;
+      padding:22px;
+      width:90%;
+      max-width:460px;
+      animation:pop .6s ease;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    }
+    @keyframes pop{from{opacity:0;transform:scale(.92);}to{opacity:1;transform:scale(1);}}
+    h1{color:var(--accent);margin:6px 0;font-size:1.4rem;}
+    p{color:#333;margin:8px 0 12px;font-size:0.95rem;}
 
-<style>
-:root{
-  --accent:#ff4e50;
-}
-html,body{
-  margin:0; padding:0;
-  height:100%;
-  font-family: 'Poppins', sans-serif;
-}
-body{
-  background-image:url("bg.png");
-  background-size:cover;
-  background-position:center;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-  position:relative;
-}
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.35);
-  z-index:0;
-}
+    input{
+      padding:10px;
+      border-radius:10px;
+      border:1px solid #ccc;
+      width:60%;
+      box-sizing:border-box;
+      font-size:1rem;
+    }
+    button{
+      background:var(--accent);
+      border:none;
+      padding:10px 14px;
+      border-radius:10px;
+      color:#fff;
+      cursor:pointer;
+      font-size:0.95rem;
+    }
+    button.secondary{
+      background:#eee;
+      color:#333;
+      border:1px solid #ddd;
+    }
+    .toast{
+      position:fixed;
+      bottom:20px;
+      left:50%;
+      transform:translateX(-50%);
+      background:#222;
+      color:#fff;
+      padding:10px 14px;
+      border-radius:10px;
+      opacity:0;
+      transition:.25s;
+      z-index:50;
+      pointer-events:none;
+    }
+    .toast.show{ opacity:1; }
 
-.card{
-  position:relative;
-  background:rgba(255,255,255,0.88);
-  border-radius:14px;
-  z-index:5;
-  text-align:center;
-  padding:20px;
-  width:90%;
-  max-width:420px;
-  animation:pop .6s ease;
-}
-@keyframes pop{from{opacity:0;transform:scale(.8);}to{opacity:1;transform:scale(1);}}
+    #slideshowOverlay{
+      position:fixed;
+      inset:0;
+      display:none;
+      z-index:20;
+      background:rgba(0,0,0,0.45);
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      box-sizing:border-box;
+    }
+    #slideCard{
+      background:#fff;
+      padding:18px;
+      border-radius:14px;
+      max-width:900px;
+      width:100%;
+      text-align:center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+    }
+    .slideImg{
+      max-width:100%;
+      max-height:70vh;
+      opacity:0;
+      border-radius:10px;
+      transition:opacity .9s ease;
+      display:block;
+      margin:0 auto 12px;
+    }
+    .slideImg.show{opacity:1;}
+    #slideCaption{ color:#333; font-size:1rem; min-height:2.2em; }
 
-h1{color:var(--accent);margin:6px 0;}
-p{color:#333;margin:8px 0 12px;}
-
-input{
-  padding:10px;
-  border-radius:10px;
-  border:1px solid #ccc;
-  width:60%;
-}
-button{
-  background:var(--accent);
-  border:none;
-  padding:10px 14px;
-  border-radius:10px;
-  color:#fff;
-  cursor:pointer;
-}
-button.secondary{
-  background:#eee;
-  color:#333;
-}
-.toast{
-  position:fixed;
-  bottom:20px;
-  left:50%;
-  transform:translateX(-50%);
-  background:#222;
-  color:#fff;
-  padding:10px 14px;
-  border-radius:10px;
-  opacity:0;
-  transition:.3s;
-  z-index:50;
-}
-.toast.show{opacity:1;}
-
-#slideshowOverlay{
-  position:fixed;
-  inset:0;
-  display:none;
-  z-index:20;
-  background:rgba(0,0,0,0.3);
-  align-items:center;
-  justify-content:center;
-}
-#slideCard{
-  background:#fff;
-  padding:18px;
-  border-radius:14px;
-  max-width:900px;
-  width:90%;
-  text-align:center;
-}
-.slideImg{
-  max-width:100%;
-  max-height:70vh;
-  opacity:0;
-  border-radius:10px;
-  transition:opacity .9s ease;
-}
-.slideImg.show{opacity:1;}
-</style>
-
+    /* small helper for mobile */
+    @media (max-width:420px){
+      input{ width:100%; margin-bottom:10px; }
+      .card{ padding:16px; }
+    }
+  </style>
 </head>
 <body>
+  <div class="card" id="card">
+    <h1>🎉 Happy Birthday ARUSHI! 🎂</h1>
+    <p id="message">Enter the secret password to unlock your surprise 😘</p>
 
-<div class="card" id="card">
-  <h1>🎉 Happy Birthday ARUSHI! 🎂</h1>
-  <p id="message">Enter the secret password to unlock your surprise 😘</p>
+    <div style="display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;">
+      <input id="pass" type="password" placeholder="Enter password" aria-label="password">
+      <button id="unlockBtn">Unlock 🎁</button>
+    </div>
 
-  <input id="pass" type="password" placeholder="Enter password">
-  <button id="unlockBtn">Unlock 🎁</button>
+    <button id="surpriseBtn" class="secondary" style="display:none;margin-top:12px">Click for Surprise 🎁</button>
 
-  <button id="surpriseBtn" class="secondary" style="display:none;margin-top:12px">Click for Surprise 🎁</button>
-
-  <div id="finalActions" style="display:none;margin-top:14px;">
-    <p style="color:var(--accent);" id="finalMsg"></p>
-    <button id="doneBtn" class="secondary" style="margin-top:10px;">Close</button>
+    <div id="finalActions" style="display:none;margin-top:14px;">
+      <p style="color:var(--accent);" id="finalMsg"></p>
+      <button id="doneBtn" class="secondary" style="margin-top:10px;">Close</button>
+    </div>
   </div>
-</div>
 
-<div id="slideshowOverlay">
-  <div id="slideCard">
-    <img id="slideImage" class="slideImg" src="">
-    <div id="slideCaption"></div>
+  <div id="slideshowOverlay">
+    <div id="slideCard">
+      <img id="slideImage" class="slideImg" src="" alt="slideshow image">
+      <div id="slideCaption"></div>
+    </div>
   </div>
-</div>
 
-<div id="toast" class="toast"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-<script>
-// Elements
-const passInput = document.getElementById("pass");
-const unlockBtn = document.getElementById("unlockBtn");
-const toast = document.getElementById("toast");
-const surpriseBtn = document.getElementById("surpriseBtn");
-const slideshow = document.getElementById("slideshowOverlay");
-const slideImg = document.getElementById("slideImage");
-const slideCaption = document.getElementById("slideCaption");
+  <script>
+    document.addEventListener("DOMContentLoaded", function(){
+      // Elements
+      const passInput = document.getElementById("pass");
+      const unlockBtn = document.getElementById("unlockBtn");
+      const toast = document.getElementById("toast");
+      const surpriseBtn = document.getElementById("surpriseBtn");
+      const slideshow = document.getElementById("slideshowOverlay");
+      const slideImg = document.getElementById("slideImage");
+      const slideCaption = document.getElementById("slideCaption");
+      const finalActions = document.getElementById("finalActions");
+      const finalMsg = document.getElementById("finalMsg");
+      const doneBtn = document.getElementById("doneBtn");
 
-// IMAGES
-const slides = [
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide1.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide2.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide3.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide4.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide5.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide6.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide7.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide8.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide9.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide10.jpg"
-];
+      // Slides (absolute URLs or relative paths)
+      const slides = [
+        "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide1.jpg",
+        "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide2.jpg",
+        "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide3.jpg",
+        "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide4.jpg",
+        "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide5.jpg",
+        "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide6.jpg",
+        "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide7.jpg",
+        "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide8.jpg",
+        "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide9.jpg",
+        "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide10.jpg"
+      ];
 
-// MESSAGES
-const messages = [
-  "You are the most special person in my life 💖",
-  "Your smile makes everything brighter ✨",
-  "Thank you for being YOU 🌻",
-  "Once again love you very much 😘",
-  "Mwuaahhh😚",
-  "I’m so lucky to have you 🎀",
-  "Happy Birthday once again my favourite person 🎂💘",
-  "menna waddek innava😌",
-  "piggy kenek wage👀",
-  "cuteeeeeeee😘💘"
-];
+      // Messages (should match slides length ideally)
+      const messages = [
+        "You are the most special person in my life 💖",
+        "Your smile makes everything brighter ✨",
+        "Thank you for being YOU 🌻",
+        "Once again love you very much 😘",
+        "Mwuaahhh😚",
+        "I’m so lucky to have you 🎀",
+        "Happy Birthday once again my favourite person 🎂💘",
+        "menna waddek innava😌",
+        "piggy kenek wage👀",
+        "cuteeeeeeee😘💘"
+      ];
 
-// Toast
-function showToast(t){
-  toast.textContent = t;
-  toast.classList.add("show");
-  setTimeout(()=>toast.classList.remove("show"),1800);
-}
+      // Toast helper
+      function showToast(text, ms = 1600){
+        toast.textContent = text;
+        toast.classList.add("show");
+        clearTimeout(toast._t);
+        toast._t = setTimeout(()=>toast.classList.remove("show"), ms);
+      }
 
-// PASSWORD UNLOCK
-unlockBtn.onclick = () => {
-  if(passInput.value === "arushi08"){
-    showToast("Correct password 😘");
-    unlockBtn.style.display="none";
-    passInput.style.display="none";
-    surpriseBtn.style.display="inline-block";
-  } else {
-    showToast("Wrong password naughty 🤭");
-  }
-};
+      // Unlock logic
+      unlockBtn.addEventListener("click", tryUnlock);
+      passInput.addEventListener("keydown", function(e){
+        if(e.key === "Enter") tryUnlock();
+      });
 
-// SLIDESHOW
-let i = 0;
-function nextSlide(){
-  if(i >= slides.length){
-    slideshow.style.display="none";
-    document.getElementById("finalActions").style.display="block";
-    document.getElementById("finalMsg").textContent="Happy Birthday again LOVE YOU UMMAH 🎈";
-    return;
-  }
-  slideImg.classList.remove("show");
-  slideImg.src = slides[i];
-  slideCaption.textContent = messages[i];
-  slideImg.onload = () => requestAnimationFrame(()=> slideImg.classList.add("show"));
-  i++;
-  setTimeout(nextSlide,2500);
-}
+      function tryUnlock(){
+        const val = passInput.value || "";
+        if(val.trim() === "arushi08"){
+          showToast("Correct password 😘");
+          // hide inputs, show surprise
+          unlockBtn.style.display = "none";
+          passInput.style.display = "none";
+          surpriseBtn.style.display = "inline-block";
+          // move focus to surprise for keyboard users
+          surpriseBtn.focus();
+        } else {
+          showToast("Wrong password naughty 🤭");
+        }
+      }
 
-// Start slideshow
-surpriseBtn.onclick = () => {
-  surpriseBtn.style.display="none";
-  slideshow.style.display="flex";
-  nextSlide();
-};
+      // Slideshow logic
+      let currentIndex = 0;
+      let slideTimer = null;
 
-document.getElementById("doneBtn").onclick = () => location.reload();
-</script>
+      function resetSlideshowState(){
+        currentIndex = 0;
+        slideImg.classList.remove("show");
+        slideImg.src = "";
+        slideCaption.textContent = "";
+        clearTimeout(slideTimer);
+      }
+
+      function nextSlide(){
+        // if we reached the end
+        if(currentIndex >= slides.length){
+          slideshow.style.display = "none";
+          finalActions.style.display = "block";
+          finalMsg.textContent = "Happy Birthday again LOVE YOU UMMAH 🎈";
+          return;
+        }
+
+        // show image & caption
+        slideImg.classList.remove("show");
+        slideImg.src = slides[currentIndex];
+        slideCaption.textContent = messages[currentIndex] || "";
+        // on load, fade in
+        slideImg.onload = () => {
+          // give the browser one frame before adding class for smoother transition
+          requestAnimationFrame(()=> slideImg.classList.add("show"));
+        };
+        // move to next after 2.5s
+        currentIndex++;
+        slideTimer = setTimeout(nextSlide, 2500);
+      }
+
+      surpriseBtn.addEventListener("click", function(){
+        // hide surprise btn, show overlay and start slideshow
+        surpriseBtn.style.display = "none";
+        finalActions.style.display = "none";
+        resetSlideshowState();
+        slideshow.style.display = "flex";
+        // small delay to ensure overlay becomes visible before loading images
+        setTimeout(nextSlide, 120);
+      });
+
+      // clicking overlay outside slideCard closes slideshow early (optional)
+      slideshow.addEventListener("click", function(e){
+        if(e.target === slideshow){
+          // stop slideshow and show final message
+          clearTimeout(slideTimer);
+          slideshow.style.display = "none";
+          finalActions.style.display = "block";
+          finalMsg.textContent = "Hope you liked it ❤️";
+        }
+      });
+
+      doneBtn.addEventListener("click", function(){
+        // reload to reset everything (keeps simple)
+        location.reload();
+      });
+
+      // quick debug: console to show that script ran
+      // console.log("Birthday script loaded");
+    }); // DOMContentLoaded
+  </script>
 </body>
 </html>
-
-
-
-
