@@ -137,28 +137,22 @@ button.secondary{
 
 <script>
 // Elements
-const slides = [
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide1.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide2.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide3.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide4.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide5.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide6.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide7.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide8.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide9.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide10.jpg"
-];
-
+const toast = document.getElementById("toast");
+const passInput = document.getElementById("pass");
+const unlockBtn = document.getElementById("unlockBtn");
+const surpriseBtn = document.getElementById("surpriseBtn");
+const slideshow = document.getElementById("slideshowOverlay");
+const slideImg = document.getElementById("slideImage");
+const slideCaption = document.getElementById("slideCaption");
 
 function showToast(t){
-  toast.textContent=t;
+  toast.textContent = t;
   toast.classList.add("show");
-  setTimeout(()=>toast.classList.remove("show"),1800);
+  setTimeout(()=> toast.classList.remove("show"),1800);
 }
 
-// MESSAGES
-const messages=[
+// Messages
+const messages = [
   "You are the most special person in my life 💖",
   "Your smile makes everything brighter ✨",
   "Thank you for being YOU 🌻",
@@ -171,49 +165,77 @@ const messages=[
   "cuteeeeeeee😘💘",
 ];
 
-// SLIDES
-const slides=[
-  "slide1.jpg","slide2.jpg","slide3.jpg","slide4.jpg","slide5.jpg",
-  "slide6.jpg","slide7.jpg","slide8.jpg","slide9.jpg","slide10.jpg"
+// Slides
+const slides = [
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide1.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide2.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide3.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide4.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRТHDAY-ARUSHIII/main/slide5.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRТHDAY-ARUSHIII/main/slide6.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRТHDAY-ARUSHIII/main/slide7.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRТHDAY-ARUSHIII/main/slide8.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRТHDAY-ARUSHIII/main/slide9.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRТHDAY-ARUSHIII/main/slide10.jpg"
 ];
 
 // PASSWORD
-unlockBtn.onclick=()=>{
-  if(passInput.value==="arushi08"){
+unlockBtn.onclick = () => {
+  if (passInput.value === "arushi08") {
     showToast("Correct password 😘");
-    unlockBtn.style.display="none";
-    passInput.style.display="none";
-    surpriseBtn.style.display="inline-block";
-  }else{
+    unlockBtn.style.display = "none";
+    passInput.style.display = "none";
+    surpriseBtn.style.display = "inline-block";
+  } else {
     showToast("Wrong password naughty 🤭");
   }
 };
 
 // SLIDESHOW
-let i=0;
+let i = 0;
 function nextSlide(){
-  if(i>=messages.length){
+  if(i >= messages.length){
     slideshow.style.display="none";
     document.getElementById("finalActions").style.display="block";
-    document.getElementById("finalMsg").textContent="Happy Birthday again LOVE YOU UMMAH 🎈";
+    document.getElementById("finalMsg").innerHTML =
+    `🎈 True friendship is a beautiful thing,<br>
+    and I am so incredibly lucky that I<br>
+    found that with you. 💖<br><br>
+
+    You are the gold standard of friends<br>
+    and I count my blessings each day<br>
+    that you came into my life!<br>
+    Your friendship is one of the things I am<br>
+    most grateful for in life. ✨<br><br>
+
+    Through the highs and the lows, the good<br>
+    and not so good, you’ve always been right<br>
+    by my side to see me through it. 🌻<br><br>
+
+    Happy birthday and thank you for being<br>
+    the most dearest and the most valuable<br>
+    person in my life! 🎂💘<br><br>
+
+    LOVE YOU UMMAHH 😘💞`;
     return;
   }
+
   slideImg.classList.remove("show");
   slideImg.src = slides[i];
   slideCaption.textContent = messages[i];
-  slideImg.onload =()=> requestAnimationFrame(()=> slideImg.classList.add("show"));
+  slideImg.onload = ()=> requestAnimationFrame(()=> slideImg.classList.add("show"));
   i++;
   setTimeout(nextSlide,2500);
 }
 
-surpriseBtn.onclick=()=>{
-  surpriseBtn.style.display="none";
-  slideshow.style.display="flex";
+surpriseBtn.onclick = () => {
+  surpriseBtn.style.display = "none";
+  slideshow.style.display = "flex";
   nextSlide();
 };
 
-document.getElementById("doneBtn").onclick=()=>location.reload();
+document.getElementById("doneBtn").onclick = () => location.reload();
 </script>
+
 </body>
 </html>
-
