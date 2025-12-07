@@ -6,13 +6,11 @@
 <title>Birthday Surprise 🎉</title>
 
 <style>
-:root{
-  --accent:#ff4e50;
-}
+:root{ --accent:#ff4e50; }
 html,body{
   margin:0; padding:0;
   height:100%;
-  font-family: 'Poppins', sans-serif;
+  font-family:'Poppins',sans-serif;
 }
 body{
   background-image:url("bg.png");
@@ -31,7 +29,6 @@ body::before{
   background:rgba(0,0,0,0.35);
   z-index:0;
 }
-
 .card{
   position:relative;
   background:rgba(255,255,255,0.88);
@@ -44,81 +41,57 @@ body::before{
   animation:pop .6s ease;
 }
 @keyframes pop{from{opacity:0;transform:scale(.8);}to{opacity:1;transform:scale(1);}}
-
 h1{color:var(--accent);margin:6px 0;}
 p{color:#333;margin:8px 0 12px;}
-
 input{
-  padding:10px;
-  border-radius:10px;
-  border:1px solid #ccc;
-  width:60%;
+  padding:10px;border-radius:10px;border:1px solid #ccc;width:60%;
 }
 button{
-  background:var(--accent);
-  border:none;
-  padding:10px 14px;
-  border-radius:10px;
-  color:#fff;
-  cursor:pointer;
+  background:var(--accent);border:none;
+  padding:10px 14px;border-radius:10px;
+  color:#fff;cursor:pointer;
 }
-button.secondary{
-  background:#eee;
-  color:#333;
-}
+button.secondary{background:#eee;color:#333;}
 .toast{
-  position:fixed;
-  bottom:20px;
-  left:50%;
+  position:fixed;bottom:20px;left:50%;
   transform:translateX(-50%);
-  background:#222;
-  color:#fff;
-  padding:10px 14px;
-  border-radius:10px;
-  opacity:0;
-  transition:.3s;
-  z-index:50;
+  background:#222;color:#fff;
+  padding:10px 14px;border-radius:10px;
+  opacity:0;transition:.3s;z-index:50;
 }
 .toast.show{opacity:1;}
 
 #slideshowOverlay{
-  position:fixed;
-  inset:0;
-  display:none;
-  z-index:20;
+  position:fixed;inset:0;
+  display:none;z-index:20;
   background:rgba(0,0,0,0.3);
-  align-items:center;
-  justify-content:center;
+  align-items:center;justify-content:center;
 }
 #slideCard{
-  background:#fff;
-  padding:18px;
-  border-radius:14px;
-  max-width:900px;
-  width:90%;
+  background:#fff;padding:18px;
+  border-radius:14px;max-width:900px;width:90%;
   text-align:center;
 }
 .slideImg{
-  max-width:100%;
-  max-height:70vh;
-  opacity:0;
-  border-radius:10px;
+  max-width:100%;max-height:70vh;
+  opacity:0;border-radius:10px;
   transition:opacity .9s ease;
 }
 .slideImg.show{opacity:1;}
 </style>
-
 </head>
-<body>
 
-<div class="card" id="card">
+<body>
+<div class="card">
   <h1>🎉 Happy Birthday ARUSHI! 🎂</h1>
-  <p id="message">Enter the secret password to unlock your surprise 😘</p>
+  <p>Enter the secret password to unlock your surprise 😘</p>
 
   <input id="pass" type="password" placeholder="Enter password">
   <button id="unlockBtn">Unlock 🎁</button>
 
-  <button id="surpriseBtn" class="secondary" style="display:none;margin-top:12px">Click for Surprise 🎁</button>
+  <button id="surpriseBtn" class="secondary" style="display:none;margin-top:12px">
+    Click for Surprise 🎁
+  </button>
 
   <div id="finalActions" style="display:none;margin-top:14px;">
     <p style="color:var(--accent);" id="finalMsg"></p>
@@ -129,7 +102,7 @@ button.secondary{
 <div id="slideshowOverlay">
   <div id="slideCard">
     <img id="slideImage" class="slideImg" src="">
-    <div id="slideCaption"></div>
+    <div id="slideCaption" style="margin-top:10px;color:#000;font-size:18px;"></div>
   </div>
 </div>
 
@@ -145,14 +118,22 @@ const slideshow = document.getElementById("slideshowOverlay");
 const slideImg = document.getElementById("slideImage");
 const slideCaption = document.getElementById("slideCaption");
 
-function showToast(t){
-  toast.textContent = t;
-  toast.classList.add("show");
-  setTimeout(()=> toast.classList.remove("show"),1800);
-}
+// SLIDES (only once!)
+const slides = [
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide1.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide2.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide3.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide4.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide5.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide6.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide7.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide8.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide9.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide10.jpg"
+];
 
-// Messages
-const messages = [
+// TEXT for each slide
+const messages=[
   "You are the most special person in my life 💖",
   "Your smile makes everything brighter ✨",
   "Thank you for being YOU 🌻",
@@ -162,79 +143,53 @@ const messages = [
   "Happy Birthday once again my favourite person 🎂💘",
   "menna waddek innava😌",
   "piggy kenek wage👀",
-  "cuteeeeeeee😘💘",
+  "cuteeeeeeee😘💘"
 ];
 
-// Slides
-const slides = [
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide1.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide2.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide3.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide4.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRТHDAY-ARUSHIII/main/slide5.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRТHDAY-ARUSHIII/main/slide6.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRТHDAY-ARUSHIII/main/slide7.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRТHDAY-ARUSHIII/main/slide8.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRТHDAY-ARUSHIII/main/slide9.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRТHDAY-ARUSHIII/main/slide10.jpg"
-];
+function showToast(t){
+  toast.textContent=t;
+  toast.classList.add("show");
+  setTimeout(()=>toast.classList.remove("show"),1800);
+}
 
-// PASSWORD
-unlockBtn.onclick = () => {
-  if (passInput.value === "arushi08") {
+// PASSWORD CHECK
+unlockBtn.onclick=()=>{
+  if(passInput.value==="arushi08"){
     showToast("Correct password 😘");
-    unlockBtn.style.display = "none";
-    passInput.style.display = "none";
-    surpriseBtn.style.display = "inline-block";
-  } else {
+    unlockBtn.style.display="none";
+    passInput.style.display="none";
+    surpriseBtn.style.display="inline-block";
+  }else{
     showToast("Wrong password naughty 🤭");
   }
 };
 
 // SLIDESHOW
-let i = 0;
+let i=0;
 function nextSlide(){
-  if(i >= messages.length){
+  if(i>=slides.length){
     slideshow.style.display="none";
     document.getElementById("finalActions").style.display="block";
-    document.getElementById("finalMsg").innerHTML =
-    `🎈 True friendship is a beautiful thing,<br>
-    and I am so incredibly lucky that I<br>
-    found that with you. 💖<br><br>
-
-    You are the gold standard of friends<br>
-    and I count my blessings each day<br>
-    that you came into my life!<br>
-    Your friendship is one of the things I am<br>
-    most grateful for in life. ✨<br><br>
-
-    Through the highs and the lows, the good<br>
-    and not so good, you’ve always been right<br>
-    by my side to see me through it. 🌻<br><br>
-
-    Happy birthday and thank you for being<br>
-    the most dearest and the most valuable<br>
-    person in my life! 🎂💘<br><br>
-
-    LOVE YOU UMMAHH 😘💞`;
+    document.getElementById("finalMsg").textContent =
+      "True friendship is a beautiful thing, and I am so incredibly lucky that I found that with you.\n\nYou are the gold standard of friends and I count my blessings each day that you came into my life!\nYour friendship is one of the things I am most grateful for in life.\n\nThrough the highs and the lows, the good and not so good, you’ve always been right by my side to see me through it.\n\nHappy birthday and thank you for being the most dearest and the most valuable person in my life! 💖🎂🎉";
     return;
   }
 
   slideImg.classList.remove("show");
   slideImg.src = slides[i];
   slideCaption.textContent = messages[i];
-  slideImg.onload = ()=> requestAnimationFrame(()=> slideImg.classList.add("show"));
+  slideImg.onload =()=> requestAnimationFrame(()=> slideImg.classList.add("show"));
   i++;
   setTimeout(nextSlide,2500);
 }
 
-surpriseBtn.onclick = () => {
-  surpriseBtn.style.display = "none";
-  slideshow.style.display = "flex";
+surpriseBtn.onclick=()=>{
+  surpriseBtn.style.display="none";
+  slideshow.style.display="flex";
   nextSlide();
 };
 
-document.getElementById("doneBtn").onclick = () => location.reload();
+document.getElementById("doneBtn").onclick=()=>location.reload();
 </script>
 
 </body>
