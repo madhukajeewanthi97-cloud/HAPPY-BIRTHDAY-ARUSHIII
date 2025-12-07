@@ -4,85 +4,91 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Birthday Surprise 🎉</title>
+
 <style>
-:root{ --accent:#ff4e50; }
-
+:root{
+  --accent:#ff4e50;
+}
 html,body{
-  margin:0;
-  padding:0;
+  margin:0; padding:0;
   height:100%;
-  font-family:'Poppins',sans-serif;
+  font-family: 'Poppins', sans-serif;
 }
-
-body {
-  background-image: url("bg.png");
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-}
-
-.container {
+body{
+  background-image:url("bg.png");
+  background-size:cover;
+  background-position:center;
   display:flex;
-  align-items:flex-start;
+  align-items:center;
   justify-content:center;
-  min-height:100vh;
-  padding-top:48px;
-  box-sizing:border-box;
+  overflow:hidden;
+  position:relative;
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.35);
+  z-index:0;
 }
 
-/* Card */
 .card{
+  position:relative;
+  background:rgba(255,255,255,0.88);
+  border-radius:14px;
+  z-index:5;
+  text-align:center;
+  padding:20px;
   width:90%;
   max-width:420px;
-  background:rgba(255,255,255,0.95);
-  padding:20px;
-  border-radius:14px;
-  text-align:center;
-  box-shadow:0 10px 30px rgba(0,0,0,0.20);
-  z-index:5;
+  animation:pop .6s ease;
 }
+@keyframes pop{from{opacity:0;transform:scale(.8);}to{opacity:1;transform:scale(1);}}
 
-h1{color:var(--accent);margin:8px 0;}
-p{margin:6px 0 14px;color:#222;font-size:1rem;}
+h1{color:var(--accent);margin:6px 0;}
+p{color:#333;margin:8px 0 12px;}
 
-.inputRow{ display:flex; gap:8px; justify-content:center; align-items:center; }
 input{
   padding:10px;
-  width:60%;
   border-radius:10px;
   border:1px solid #ccc;
-  font-size:1rem;
-  box-sizing:border-box;
+  width:60%;
 }
 button{
-  padding:10px 14px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
   background:var(--accent);
+  border:none;
+  padding:10px 14px;
+  border-radius:10px;
   color:#fff;
-  font-size:1rem;
+  cursor:pointer;
 }
 button.secondary{
   background:#eee;
   color:#333;
-  border:1px solid #ddd;
 }
+.toast{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#222;
+  color:#fff;
+  padding:10px 14px;
+  border-radius:10px;
+  opacity:0;
+  transition:.3s;
+  z-index:50;
+}
+.toast.show{opacity:1;}
 
-/* small inline feedback */
-#feedback{ height:1.2em; margin-top:8px; color:#b00020; font-size:0.95rem; }
-
-/* Slideshow */
 #slideshowOverlay{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,0.45);
   display:none;
+  z-index:20;
+  background:rgba(0,0,0,0.3);
   align-items:center;
   justify-content:center;
-  z-index:20;
 }
 #slideCard{
   background:#fff;
@@ -91,184 +97,123 @@ button.secondary{
   max-width:900px;
   width:90%;
   text-align:center;
-  box-shadow:0 10px 40px rgba(0,0,0,0.4);
 }
 .slideImg{
   max-width:100%;
   max-height:70vh;
-  border-radius:10px;
   opacity:0;
-  transition:opacity .6s;
-  display:block;
-  margin:0 auto 10px;
+  border-radius:10px;
+  transition:opacity .9s ease;
 }
 .slideImg.show{opacity:1;}
-
-#finalActions{display:none;margin-top:14px;}
-#slideCaption{color:#222;font-size:1rem;min-height:2em; white-space:pre-wrap;}
 </style>
+
 </head>
 <body>
 
-<div class="container">
-  <div class="card" role="main" aria-label="Birthday card">
-    <h1>🎉 Happy Birthday ARUSHI! 🎂</h1>
-    <p id="message">Enter the secret password to unlock your surprise 😘</p>
+<div class="card" id="card">
+  <h1>🎉 Happy Birthday ARUSHI! 🎂</h1>
+  <p id="message">Enter the secret password to unlock your surprise 😘</p>
 
-    <div class="inputRow">
-      <input id="pass" type="password" placeholder="Enter password" autocomplete="off" autofocus>
-      <button id="unlockBtn" aria-label="Unlock">Unlock</button>
-    </div>
+  <input id="pass" type="password" placeholder="Enter password">
+  <button id="unlockBtn">Unlock 🎁</button>
 
-    <div id="feedback" aria-live="polite"></div>
+  <button id="surpriseBtn" class="secondary" style="display:none;margin-top:12px">Click for Surprise 🎁</button>
 
-    <button id="surpriseBtn" class="secondary" style="display:none;margin-top:12px;">Click for Surprise 🎁</button>
-
-    <div id="finalActions">
-      <p id="finalMsg" style="color:var(--accent)"></p>
-      <button id="doneBtn" class="secondary" style="margin-top:10px;">Close / Reload</button>
-    </div>
+  <div id="finalActions" style="display:none;margin-top:14px;">
+    <p style="color:var(--accent);" id="finalMsg"></p>
+    <button id="doneBtn" class="secondary" style="margin-top:10px;">Close</button>
   </div>
 </div>
 
-<div id="slideshowOverlay" role="dialog" aria-hidden="true">
+<div id="slideshowOverlay">
   <div id="slideCard">
-    <img id="slideImage" class="slideImg" src="" alt="slide image">
+    <img id="slideImage" class="slideImg" src="">
     <div id="slideCaption"></div>
   </div>
 </div>
 
+<div id="toast" class="toast"></div>
+
 <script>
-/*
-  Defensive script:
-  - waits for DOMContentLoaded
-  - uses addEventListener
-  - gives visible feedback on wrong password
-  - logs helpful messages to console
-*/
+// Elements
+const slides = [
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide1.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide2.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide3.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide4.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide5.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide6.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide7.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide8.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide9.jpg",
+  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide10.jpg"
+];
 
-document.addEventListener('DOMContentLoaded', () => {
-  const passInput = document.getElementById('pass');
-  const unlockBtn = document.getElementById('unlockBtn');
-  const surpriseBtn = document.getElementById('surpriseBtn');
-  const slideshow = document.getElementById('slideshowOverlay');
-  const slideImg = document.getElementById('slideImage');
-  const slideCaption = document.getElementById('slideCaption');
-  const finalActions = document.getElementById('finalActions');
-  const finalMsg = document.getElementById('finalMsg');
-  const feedback = document.getElementById('feedback');
 
-  const slides = [
-    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide1.jpg",
-    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide2.jpg",
-    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide3.jpg",
-    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide4.jpg",
-    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide5.jpg",
-    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide6.jpg",
-    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide7.jpg",
-    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide8.jpg",
-    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide9.jpg",
-    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide10.jpg"
-  ];
+function showToast(t){
+  toast.textContent=t;
+  toast.classList.add("show");
+  setTimeout(()=>toast.classList.remove("show"),1800);
+}
 
-  const messages = [
-    "You are the most special person in my life 💖",
-    "Your smile makes everything brighter ✨",
-    "Thank you for being YOU 🌻",
-    "Once again love you very much 😘",
-    "Mwuaahhh😚",
-    "I’m so lucky to have you 🎀",
-    "Happy Birthday once again my favourite person 🎂💘",
-    "menna waddek innava😌",
-    "piggy kenek wage👀",
-    "cuteeeeeeee😘💘"
-  ];
+// MESSAGES
+const messages=[
+  "You are the most special person in my life 💖",
+  "Your smile makes everything brighter ✨",
+  "Thank you for being YOU 🌻",
+  "Once again love you very much 😘",
+  "Mwuaahhh😚",
+  "I’m so lucky to have you 🎀",
+  "Happy Birthday once again my favourite person 🎂💘",
+  "menna waddek innava😌",
+  "piggy kenek wage👀",
+  "cuteeeeeeee😘💘",
+];
 
-  // defensive checks
-  if (!unlockBtn || !passInput) {
-    console.error('Critical elements not found. unlockBtn or passInput missing.');
-    feedback.textContent = 'Unexpected error: page not loaded correctly.';
+// SLIDES
+const slides=[
+  "slide1.jpg","slide2.jpg","slide3.jpg","slide4.jpg","slide5.jpg",
+  "slide6.jpg","slide7.jpg","slide8.jpg","slide9.jpg","slide10.jpg"
+];
+
+// PASSWORD
+unlockBtn.onclick=()=>{
+  if(passInput.value==="arushi08"){
+    showToast("Correct password 😘");
+    unlockBtn.style.display="none";
+    passInput.style.display="none";
+    surpriseBtn.style.display="inline-block";
+  }else{
+    showToast("Wrong password naughty 🤭");
+  }
+};
+
+// SLIDESHOW
+let i=0;
+function nextSlide(){
+  if(i>=messages.length){
+    slideshow.style.display="none";
+    document.getElementById("finalActions").style.display="block";
+    document.getElementById("finalMsg").textContent="Happy Birthday again LOVE YOU UMMAH 🎈";
     return;
   }
+  slideImg.classList.remove("show");
+  slideImg.src = slides[i];
+  slideCaption.textContent = messages[i];
+  slideImg.onload =()=> requestAnimationFrame(()=> slideImg.classList.add("show"));
+  i++;
+  setTimeout(nextSlide,2500);
+}
 
-  console.log('Birthday page loaded. Password is "arushi08" (case-sensitive).');
+surpriseBtn.onclick=()=>{
+  surpriseBtn.style.display="none";
+  slideshow.style.display="flex";
+  nextSlide();
+};
 
-  function showWrong(msg = 'Wrong password — try again') {
-    feedback.textContent = msg;
-    feedback.style.color = '#b00020';
-    passInput.value = '';
-    passInput.focus();
-  }
-
-  unlockBtn.addEventListener('click', () => {
-    try {
-      if (passInput.value === 'arushi08') {
-        feedback.textContent = '';
-        unlockBtn.style.display = 'none';
-        passInput.style.display = 'none';
-        surpriseBtn.style.display = 'inline-block';
-        console.log('Password accepted — surprise button shown.');
-      } else {
-        showWrong();
-        console.log('Wrong password entered:', passInput.value);
-      }
-    } catch (err) {
-      console.error('Error in unlock click handler:', err);
-      feedback.textContent = 'An error occurred — open console.';
-    }
-  });
-
-  // allow Enter key
-  passInput.addEventListener('keyup', (e) => {
-    if (e.key === 'Enter') unlockBtn.click();
-  });
-
-  // slideshow logic
-  let i = 0, timer = null;
-  function nextSlide(){
-    if (i >= slides.length) {
-      slideshow.style.display = 'none';
-      slideshow.setAttribute('aria-hidden', 'true');
-      finalActions.style.display = 'block';
-      finalMsg.textContent =
-        "Happy Birthday again LOVE YOU UMMAH 🎈\n\n" +
-        "True friendship is a beautiful thing, and I am so incredibly lucky that I found that with you.\n\n" +
-        "You are the gold standard of friends and I count my blessings each day that you came into my life!\n\n" +
-        "Your friendship is one of the things I am most grateful for in life. Through the highs and the lows, you’ve always been right by my side.\n\n" +
-        "Happy birthday and thank you for being the most dearest and most valuable person in my life!";
-      console.log('Slideshow finished.');
-      return;
-    }
-
-    slideImg.classList.remove('show');
-    slideImg.src = slides[i];
-    slideCaption.textContent = messages[i];
-    slideImg.onload = () => requestAnimationFrame(() => slideImg.classList.add('show'));
-    slideImg.onerror = () => {
-      console.warn('Slide failed to load: ', slides[i]);
-      // show placeholder message but continue
-      slideCaption.textContent = '(image not available) ' + messages[i];
-    };
-    i++;
-    timer = setTimeout(nextSlide, 2600);
-  }
-
-  surpriseBtn.addEventListener('click', () => {
-    try {
-      i = 0;
-      finalActions.style.display = 'none';
-      slideshow.style.display = 'flex';
-      slideshow.setAttribute('aria-hidden', 'false');
-      nextSlide();
-      console.log('Slideshow started.');
-    } catch (err) {
-      console.error('Error starting slideshow:', err);
-      feedback.textContent = 'Could not start slideshow — open console.';
-    }
-  });
-
-  document.getElementById('doneBtn').addEventListener('click', () => location.reload());
-});
+document.getElementById("doneBtn").onclick=()=>location.reload();
 </script>
 </body>
 </html>
+
