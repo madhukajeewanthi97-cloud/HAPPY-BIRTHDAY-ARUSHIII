@@ -4,7 +4,6 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Birthday Surprise 🎉</title>
-
 <style>
 :root{ --accent:#ff4e50; }
 
@@ -15,37 +14,47 @@ html,body{
   font-family:'Poppins',sans-serif;
 }
 
-/* body styling placed correctly */
 body {
   background-image: url("bg.png");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+.container {
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  min-height:100vh;
+  padding-top:48px;
+  box-sizing:border-box;
 }
 
 /* Card */
 .card{
   width:90%;
   max-width:420px;
-  background:rgba(255,255,255,0.9);
+  background:rgba(255,255,255,0.95);
   padding:20px;
   border-radius:14px;
   text-align:center;
-  box-shadow:0 10px 30px rgba(0,0,0,0.25);
+  box-shadow:0 10px 30px rgba(0,0,0,0.20);
   z-index:5;
-  margin:auto;
-  margin-top:50px;
 }
 
 h1{color:var(--accent);margin:8px 0;}
-p{margin:6px 0 14px;color:#222;}
+p{margin:6px 0 14px;color:#222;font-size:1rem;}
 
+.inputRow{ display:flex; gap:8px; justify-content:center; align-items:center; }
 input{
   padding:10px;
   width:60%;
   border-radius:10px;
   border:1px solid #ccc;
   font-size:1rem;
+  box-sizing:border-box;
 }
 button{
   padding:10px 14px;
@@ -62,11 +71,14 @@ button.secondary{
   border:1px solid #ddd;
 }
 
+/* small inline feedback */
+#feedback{ height:1.2em; margin-top:8px; color:#b00020; font-size:0.95rem; }
+
 /* Slideshow */
 #slideshowOverlay{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,0.3);
+  background:rgba(0,0,0,0.45);
   display:none;
   align-items:center;
   justify-content:center;
@@ -86,123 +98,177 @@ button.secondary{
   max-height:70vh;
   border-radius:10px;
   opacity:0;
-  transition:opacity .8s;
+  transition:opacity .6s;
   display:block;
   margin:0 auto 10px;
 }
 .slideImg.show{opacity:1;}
 
 #finalActions{display:none;margin-top:14px;}
-#slideCaption{color:#222;font-size:1rem;min-height:2em;}
+#slideCaption{color:#222;font-size:1rem;min-height:2em; white-space:pre-wrap;}
 </style>
 </head>
-
 <body>
 
-<div class="card">
-  <h1>🎉 Happy Birthday ARUSHI! 🎂</h1>
-  <p id="message">Enter the secret password to unlock your surprise 😘</p>
+<div class="container">
+  <div class="card" role="main" aria-label="Birthday card">
+    <h1>🎉 Happy Birthday ARUSHI! 🎂</h1>
+    <p id="message">Enter the secret password to unlock your surprise 😘</p>
 
-  <input id="pass" type="password" placeholder="Enter password">
-  <button id="unlockBtn">Unlock 🎁</button>
+    <div class="inputRow">
+      <input id="pass" type="password" placeholder="Enter password" autocomplete="off" autofocus>
+      <button id="unlockBtn" aria-label="Unlock">Unlock</button>
+    </div>
 
-  <button id="surpriseBtn" class="secondary" style="display:none;margin-top:10px;">Click for Surprise 🎁</button>
+    <div id="feedback" aria-live="polite"></div>
 
-  <div id="finalActions">
-    <p id="finalMsg" style="color:var(--accent)"></p>
-    <button id="doneBtn" class="secondary" style="margin-top:10px;">Close / Reload</button>
+    <button id="surpriseBtn" class="secondary" style="display:none;margin-top:12px;">Click for Surprise 🎁</button>
+
+    <div id="finalActions">
+      <p id="finalMsg" style="color:var(--accent)"></p>
+      <button id="doneBtn" class="secondary" style="margin-top:10px;">Close / Reload</button>
+    </div>
   </div>
 </div>
 
-<div id="slideshowOverlay">
+<div id="slideshowOverlay" role="dialog" aria-hidden="true">
   <div id="slideCard">
-    <img id="slideImage" class="slideImg" src="">
+    <img id="slideImage" class="slideImg" src="" alt="slide image">
     <div id="slideCaption"></div>
   </div>
 </div>
 
 <script>
-// Elements
-const passInput = document.getElementById('pass');
-const unlockBtn = document.getElementById('unlockBtn');
-const surpriseBtn = document.getElementById('surpriseBtn');
-const slideshow = document.getElementById('slideshowOverlay');
-const slideImg = document.getElementById('slideImage');
-const slideCaption = document.getElementById('slideCaption');
-const finalActions = document.getElementById('finalActions');
-const finalMsg = document.getElementById('finalMsg');
+/*
+  Defensive script:
+  - waits for DOMContentLoaded
+  - uses addEventListener
+  - gives visible feedback on wrong password
+  - logs helpful messages to console
+*/
 
-const slides = [
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide1.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide2.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide3.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide4.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide5.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide6.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide7.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide8.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide9.jpg",
-  "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide10.jpg"
-];
+document.addEventListener('DOMContentLoaded', () => {
+  const passInput = document.getElementById('pass');
+  const unlockBtn = document.getElementById('unlockBtn');
+  const surpriseBtn = document.getElementById('surpriseBtn');
+  const slideshow = document.getElementById('slideshowOverlay');
+  const slideImg = document.getElementById('slideImage');
+  const slideCaption = document.getElementById('slideCaption');
+  const finalActions = document.getElementById('finalActions');
+  const finalMsg = document.getElementById('finalMsg');
+  const feedback = document.getElementById('feedback');
 
-const messages = [
-  "You are the most special person in my life 💖",
-  "Your smile makes everything brighter ✨",
-  "Thank you for being YOU 🌻",
-  "Once again love you very much 😘",
-  "Mwuaahhh😚",
-  "I’m so lucky to have you 🎀",
-  "Happy Birthday once again my favourite person 🎂💘",
-  "menna waddek innava😌",
-  "piggy kenek wage👀",
-  "cuteeeeeeee😘💘"
-];
+  const slides = [
+    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide1.jpg",
+    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide2.jpg",
+    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide3.jpg",
+    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide4.jpg",
+    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide5.jpg",
+    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide6.jpg",
+    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide7.jpg",
+    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide8.jpg",
+    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide9.jpg",
+    "https://raw.githubusercontent.com/madhukajeewanthi97-cloud/HAPPY-BIRTHDAY-ARUSHIII/main/slide10.jpg"
+  ];
 
-// UNLOCK
-unlockBtn.onclick = () => {
-  if (passInput.value === "arushi08") {
-    unlockBtn.style.display = "none";
-    passInput.style.display = "none";
-    surpriseBtn.style.display = "inline-block";
-  } else {
-    // small feedback when wrong
-    passInput.value = "";
-    passInput.placeholder = "Try again";
-  }
-};
+  const messages = [
+    "You are the most special person in my life 💖",
+    "Your smile makes everything brighter ✨",
+    "Thank you for being YOU 🌻",
+    "Once again love you very much 😘",
+    "Mwuaahhh😚",
+    "I’m so lucky to have you 🎀",
+    "Happy Birthday once again my favourite person 🎂💘",
+    "menna waddek innava😌",
+    "piggy kenek wage👀",
+    "cuteeeeeeee😘💘"
+  ];
 
-// SLIDESHOW
-let i = 0;
-let timer;
-function nextSlide(){
-  if (i >= slides.length) {
-    slideshow.style.display = "none";
-    finalActions.style.display = "block";
-    finalMsg.textContent =
-      "Happy Birthday again LOVE YOU UMMAH 🎈\n\n" +
-      "True friendship is a beautiful thing, and I am so incredibly lucky that I found that with you.\n\n" +
-      "You are the gold standard of friends and I count my blessings each day that you came into my life!\n\n" +
-      "Your friendship is one of the things I am most grateful for in life. Through the highs and the lows, you’ve always been right by my side.\n\n" +
-      "Happy birthday and thank you for being the most dearest and most valuable person in my life!";
+  // defensive checks
+  if (!unlockBtn || !passInput) {
+    console.error('Critical elements not found. unlockBtn or passInput missing.');
+    feedback.textContent = 'Unexpected error: page not loaded correctly.';
     return;
   }
 
-  slideImg.classList.remove("show");
-  slideImg.src = slides[i];
-  slideCaption.textContent = messages[i];
-  slideImg.onload = () => requestAnimationFrame(() => slideImg.classList.add("show"));
-  i++;
-  timer = setTimeout(nextSlide, 2600);
-}
+  console.log('Birthday page loaded. Password is "arushi08" (case-sensitive).');
 
-surpriseBtn.onclick = () => {
-  i = 0;
-  slideshow.style.display = "flex";
-  nextSlide();
-};
+  function showWrong(msg = 'Wrong password — try again') {
+    feedback.textContent = msg;
+    feedback.style.color = '#b00020';
+    passInput.value = '';
+    passInput.focus();
+  }
 
-document.getElementById("doneBtn").onclick = () => location.reload();
+  unlockBtn.addEventListener('click', () => {
+    try {
+      if (passInput.value === 'arushi08') {
+        feedback.textContent = '';
+        unlockBtn.style.display = 'none';
+        passInput.style.display = 'none';
+        surpriseBtn.style.display = 'inline-block';
+        console.log('Password accepted — surprise button shown.');
+      } else {
+        showWrong();
+        console.log('Wrong password entered:', passInput.value);
+      }
+    } catch (err) {
+      console.error('Error in unlock click handler:', err);
+      feedback.textContent = 'An error occurred — open console.';
+    }
+  });
+
+  // allow Enter key
+  passInput.addEventListener('keyup', (e) => {
+    if (e.key === 'Enter') unlockBtn.click();
+  });
+
+  // slideshow logic
+  let i = 0, timer = null;
+  function nextSlide(){
+    if (i >= slides.length) {
+      slideshow.style.display = 'none';
+      slideshow.setAttribute('aria-hidden', 'true');
+      finalActions.style.display = 'block';
+      finalMsg.textContent =
+        "Happy Birthday again LOVE YOU UMMAH 🎈\n\n" +
+        "True friendship is a beautiful thing, and I am so incredibly lucky that I found that with you.\n\n" +
+        "You are the gold standard of friends and I count my blessings each day that you came into my life!\n\n" +
+        "Your friendship is one of the things I am most grateful for in life. Through the highs and the lows, you’ve always been right by my side.\n\n" +
+        "Happy birthday and thank you for being the most dearest and most valuable person in my life!";
+      console.log('Slideshow finished.');
+      return;
+    }
+
+    slideImg.classList.remove('show');
+    slideImg.src = slides[i];
+    slideCaption.textContent = messages[i];
+    slideImg.onload = () => requestAnimationFrame(() => slideImg.classList.add('show'));
+    slideImg.onerror = () => {
+      console.warn('Slide failed to load: ', slides[i]);
+      // show placeholder message but continue
+      slideCaption.textContent = '(image not available) ' + messages[i];
+    };
+    i++;
+    timer = setTimeout(nextSlide, 2600);
+  }
+
+  surpriseBtn.addEventListener('click', () => {
+    try {
+      i = 0;
+      finalActions.style.display = 'none';
+      slideshow.style.display = 'flex';
+      slideshow.setAttribute('aria-hidden', 'false');
+      nextSlide();
+      console.log('Slideshow started.');
+    } catch (err) {
+      console.error('Error starting slideshow:', err);
+      feedback.textContent = 'Could not start slideshow — open console.';
+    }
+  });
+
+  document.getElementById('doneBtn').addEventListener('click', () => location.reload());
+});
 </script>
-
 </body>
 </html>
