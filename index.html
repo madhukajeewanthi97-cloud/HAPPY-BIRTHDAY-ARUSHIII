@@ -1,91 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Birthday Surprise 🎉</title>
-  <style>
-    :root{ --accent:#ff4e50; }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Birthday Surprise 🎉</title>
 
-    html,body{
-      margin:0;
-      padding:0;
-      height:100%;
-      font-family:'Poppins',sans-serif;
-    body {
+<style>
+:root{ --accent:#ff4e50; }
+
+html,body{
+  margin:0;
+  padding:0;
+  height:100%;
+  font-family:'Poppins',sans-serif;
+}
+
+body {
   background-image: url("bg.png");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
 }
-      .card{
-      width:90%;
-      max-width:420px;
-      background:rgba(255,255,255,0.9);
-      padding:20px;
-      border-radius:14px;
-      text-align:center;
-      box-shadow:0 10px 30px rgba(0,0,0,0.25);
-      z-index:5;
-    }
 
-    h1{color:var(--accent);margin:8px 0;}
-    p{margin:6px 0 14px;color:#222;}
+/* Card */
+.card{
+  width:90%;
+  max-width:420px;
+  background:rgba(255,255,255,0.9);
+  padding:20px;
+  border-radius:14px;
+  text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,0.25);
+  z-index:5;
+  margin:auto;
+  margin-top:50px;
+}
 
-    input{
-      padding:10px;
-      width:60%;
-      border-radius:10px;
-      border:1px solid #ccc;
-      font-size:1rem;
-    }
-    button{
-      padding:10px 14px;
-      border:none;
-      border-radius:10px;
-      cursor:pointer;
-      background:var(--accent);
-      color:#fff;
-      font-size:1rem;
-    }
-    button.secondary{
-      background:#eee;
-      color:#333;
-      border:1px solid #ddd;
-    }
+h1{color:var(--accent);margin:8px 0;}
+p{margin:6px 0 14px;color:#222;}
 
-    #slideshowOverlay{
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,0.3);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index:20;
-    }
-    #slideCard{
-      background:#fff;
-      padding:18px;
-      border-radius:14px;
-      max-width:900px;
-      width:90%;
-      text-align:center;
-      box-shadow:0 10px 40px rgba(0,0,0,0.4);
-    }
-    .slideImg{
-      max-width:100%;
-      max-height:70vh;
-      border-radius:10px;
-      opacity:0;
-      transition:opacity .8s;
-      display:block;
-      margin:0 auto 10px;
-    }
-    .slideImg.show{opacity:1;}
+input{
+  padding:10px;
+  width:60%;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:1rem;
+}
+button{
+  padding:10px 14px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  background:var(--accent);
+  color:#fff;
+  font-size:1rem;
+}
+button.secondary{
+  background:#eee;
+  color:#333;
+  border:1px solid #ddd;
+}
 
-    #finalActions{display:none;margin-top:14px;}
-    #slideCaption{color:#222;font-size:1rem;min-height:2em;}
-  </style>
+/* Slideshow */
+#slideshowOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.3);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:20;
+}
+#slideCard{
+  background:#fff;
+  padding:18px;
+  border-radius:14px;
+  max-width:900px;
+  width:90%;
+  text-align:center;
+  box-shadow:0 10px 40px rgba(0,0,0,0.4);
+}
+.slideImg{
+  max-width:100%;
+  max-height:70vh;
+  border-radius:10px;
+  opacity:0;
+  transition:opacity .8s;
+  display:block;
+  margin:0 auto 10px;
+}
+.slideImg.show{opacity:1;}
+
+#finalActions{display:none;margin-top:14px;}
+#slideCaption{color:#222;font-size:1rem;min-height:2em;}
+</style>
 </head>
 
 <body>
@@ -111,6 +119,7 @@
     <div id="slideCaption"></div>
   </div>
 </div>
+
 
 <script>
 // Elements
@@ -149,7 +158,7 @@ const messages = [
   "cuteeeeeeee😘💘"
 ];
 
-// UNLOCK
+// Unlock
 unlockBtn.onclick = () => {
   if(passInput.value === "arushi08"){
     unlockBtn.style.display="none";
@@ -158,33 +167,24 @@ unlockBtn.onclick = () => {
   }
 };
 
-// SLIDESHOW
+// Slideshow
 let i = 0;
 let timer;
+
 function nextSlide(){
   if(i >= slides.length){
     slideshow.style.display="none";
     finalActions.style.display="block";
-    finalMsg.textContent="Happy Birthday again LOVE YOU UMMAH 🎈"
-                           "True friendship is a beautiful thing,
-                          and I am so incredibly lucky that I
-                          found that with you.",
-
-                          "You are the gold standard of friends
-                          and I count my blessings each day
-                          that you came into my life!"
-                            Your friendship is one of the things I am
-                            most grateful for in life.",
-
-                           "Through the highs and the lows, the good
-                           and not so good, you’ve always been right 
-                           by my side to see me through it.",
-
-                             "Happy birthday and thank you for being
-                            the most dearest and most valuable person in my life!"
-                            ;
+    finalMsg.textContent =
+      "Happy Birthday again LOVE YOU UMMAH 🎈\n\n" +
+      "True friendship is a beautiful thing, and I am so incredibly lucky that I found that with you.\n" +
+      "You are the gold standard of friends and I count my blessings each day that you came into my life!\n\n" +
+      "Your friendship is one of the things I am most grateful for in life.\n" +
+      "Through the highs and the lows, you’ve always been right by my side.\n\n" +
+      "Happy birthday and thank you for being the most dearest and most valuable person in my life!";
     return;
   }
+
   slideImg.classList.remove("show");
   slideImg.src = slides[i];
   slideCaption.textContent = messages[i];
@@ -204,5 +204,3 @@ document.getElementById("doneBtn").onclick = () => location.reload();
 
 </body>
 </html>
-
-
