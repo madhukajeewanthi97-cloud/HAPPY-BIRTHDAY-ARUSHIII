@@ -15,6 +15,7 @@ html,body{
   font-family:'Poppins',sans-serif;
 }
 
+/* body styling placed correctly */
 body {
   background-image: url("bg.png");
   background-size: cover;
@@ -120,7 +121,6 @@ button.secondary{
   </div>
 </div>
 
-
 <script>
 // Elements
 const passInput = document.getElementById('pass');
@@ -158,29 +158,31 @@ const messages = [
   "cuteeeeeeee😘💘"
 ];
 
-// Unlock
+// UNLOCK
 unlockBtn.onclick = () => {
-  if(passInput.value === "arushi08"){
-    unlockBtn.style.display="none";
-    passInput.style.display="none";
-    surpriseBtn.style.display="inline-block";
+  if (passInput.value === "arushi08") {
+    unlockBtn.style.display = "none";
+    passInput.style.display = "none";
+    surpriseBtn.style.display = "inline-block";
+  } else {
+    // small feedback when wrong
+    passInput.value = "";
+    passInput.placeholder = "Try again";
   }
 };
 
-// Slideshow
+// SLIDESHOW
 let i = 0;
 let timer;
-
 function nextSlide(){
-  if(i >= slides.length){
-    slideshow.style.display="none";
-    finalActions.style.display="block";
+  if (i >= slides.length) {
+    slideshow.style.display = "none";
+    finalActions.style.display = "block";
     finalMsg.textContent =
       "Happy Birthday again LOVE YOU UMMAH 🎈\n\n" +
-      "True friendship is a beautiful thing, and I am so incredibly lucky that I found that with you.\n" +
+      "True friendship is a beautiful thing, and I am so incredibly lucky that I found that with you.\n\n" +
       "You are the gold standard of friends and I count my blessings each day that you came into my life!\n\n" +
-      "Your friendship is one of the things I am most grateful for in life.\n" +
-      "Through the highs and the lows, you’ve always been right by my side.\n\n" +
+      "Your friendship is one of the things I am most grateful for in life. Through the highs and the lows, you’ve always been right by my side.\n\n" +
       "Happy birthday and thank you for being the most dearest and most valuable person in my life!";
     return;
   }
@@ -188,14 +190,14 @@ function nextSlide(){
   slideImg.classList.remove("show");
   slideImg.src = slides[i];
   slideCaption.textContent = messages[i];
-  slideImg.onload = () => requestAnimationFrame(()=> slideImg.classList.add("show"));
+  slideImg.onload = () => requestAnimationFrame(() => slideImg.classList.add("show"));
   i++;
   timer = setTimeout(nextSlide, 2600);
 }
 
 surpriseBtn.onclick = () => {
   i = 0;
-  slideshow.style.display="flex";
+  slideshow.style.display = "flex";
   nextSlide();
 };
 
